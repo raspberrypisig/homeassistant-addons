@@ -22,8 +22,8 @@ def isFile(elem):
 def listFiles(basedir, requestedPath, glob="*"):
     p = Path(basedir).joinpath(requestedPath)
     if p.is_dir():
-        files = p.glob(glob)
-        files = list(filter(isFile, list(files)))
+        files = list(p.glob(glob))
+        files = list(filter(isFile, files))      
         files = list(map(modifyURL, files))
         return jsonify(files)
     else:
