@@ -11,7 +11,7 @@ The result is a JSON document of an array of strings(either full paths of files 
 |    |--- Snoop Dogg/
 |         |--- 1.mp3
 |         |--- 2.mp3
-|         |--- Cool Ringtone.mp3    
+|         |--- Cool Ringtone.m4a
 |    |--- Roxette/
 |         |--- 1980hits.txt
 |         |--- boo.wav
@@ -26,7 +26,7 @@ The result is a JSON document of an array of strings(either full paths of files 
 http://<HOME_ASSISTANT_IP>:8000
 ```
 
-The example layout would return ["/Music"]
+The example layout would return ["Music"]
 
 
 ### Directories under a subdiretory
@@ -35,7 +35,7 @@ The example layout would return ["/Music"]
 http://<HOME_ASSISTANT_IP>:8000/directories/Music
 ```
 
-The example layout would return ["/Music/Snoop Dogg", "/Music/Roxette"]
+The example layout would return ["Snoop Dogg", "Roxette"]
 
 ### Files under a subdirectory
 
