@@ -1,0 +1,18 @@
+{
+    "version": "2.0.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "shareexplorer",
+            "runtimeExecutable": "bash",
+            "runtimeArgs": [
+                "rebuild.sh"
+            ],
+            "outFiles": [],
+            "sourceMaps": true,
+            "internalConsoleOptions": "openOnSessionStart",
+            "timeout": 20000
+        }
+    ]
+}
