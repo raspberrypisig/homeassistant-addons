@@ -13,11 +13,18 @@ def modifyURL(elem):
 def modifyURLDir(elem):
     return elem.name
 
+def isFile(elem):
+    if elem.is_file():
+        return True
+    else:
+        return False
+
 def listFiles(basedir, requestedPath, glob="*"):
     p = Path(basedir).joinpath(requestedPath)
     if p.is_dir():
         files = p.glob(glob)
-        files = list(map(modifyURL, list(files)))
+        files = list(filter(isFile, list(files)))
+        files = list(map(modifyURL, files))
         return jsonify(files)
     else:
         return jsonify([])
