@@ -1,14 +1,33 @@
 from pathlib import Path
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, Response
+import requests
 
 app = Flask(__name__)
-BASEDIR = "/config/www"
-LOCAL="/local"
+BASEDIR = "."
 HOST="0.0.0.0"
 PORT=8000
 
+def _proxy(*args, **kwargs):
+    print(request.url, flush=True)
+    resp = requests.request(
+        method=request.method,
+        url=request.url.replace(request.host_url, 'http://127.0.0.1/'),
+        headers={key: value for (key, value) in request.headers if key != 'Host'},
+        allow_redirects=False)
+
+    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+    headers = [(name, value) for (name, value) in resp.raw.headers.items()
+               if name.lower() not in excluded_headers]
+
+    response = Response(resp.content, resp.status_code, headers)
+    return response
+
 def modifyURL(elem):
-    return str(elem).replace(BASEDIR, LOCAL)
+    args = request.args.to_dict()
+    if 'out' in args:
+        return str(elem)
+    else:
+        return elem.name
 
 def modifyURLDir(elem):
     return elem.name
@@ -37,21 +56,28 @@ def listDir(basedir, requestedPath):
   else:
       return jsonify([])
 
-@app.route('/files/<path:req>/filter/<path:glob>')
+@app.route('/api/files/<path:req>/filter/<path:glob>')
 def listSelectedFilesInPath(req, glob):
     return listFiles(BASEDIR, req, glob)
 
-@app.route('/files/<path:req>')
+@app.route('/api/files/<path:req>')
 def listAllFilesInPath(req):
     return listFiles(BASEDIR, req)
 
-@app.route('/directories/<path:req>')
-def listSubdirectories(req):
+@app.route('/api/directories/<path:req>')
+def listSubdirectories(req='/'):
     return listDir(BASEDIR, req)
 
+
 @app.route('/')
-def default():
-    return listDir(BASEDIR, "")
+def index():
+    return _proxy()
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def default(path):
+    return _proxy()
+    
 
 if __name__ == "__main__":
     app.run(host=HOST, port=PORT)

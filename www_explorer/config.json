@@ -1,13 +1,13 @@
 {
     "name": "WWW Explorer",
-    "version": "0.2",
+    "version": "0.4",
     "slug": "www_explorer",
     "url": "https://github.com/raspberrypisig/homeassistant-addons/www_explorer",
     "description": "Explore files and folders listing under /config/www directory from HTTP requests.",
     "arch": ["armhf", "armv7", "aarch64"],
     "startup": "application",
     "boot": "auto",
-    "map": ["config:ro"],
+    "map": ["config:rw", "share:rw", "backup:rw", "addons:rw", "ssl:rw"],
     "options": {},
     "ports": {
         "8000/tcp": 8000
