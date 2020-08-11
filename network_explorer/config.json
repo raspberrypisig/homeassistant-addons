@@ -1,0 +1,21 @@
+{
+    "name": "Network Explorer",
+    "version": "0.1",
+    "slug": "network_explorer",
+    "url": "https://github.com/raspberrypisig/homeassistant-addons/network_explorer",
+    "description": "Explore network files and folders from HTTP requests.",
+    "arch": ["armhf", "armv7", "aarch64"],
+    "startup": "application",
+    "boot": "auto",
+    "map": ["config:rw"],
+    "full_access": true,
+    "privileged": ["NET_ADMIN","SYS_ADMIN","SYS_MODULE", "SYS_RESOURCE"],
+    "options": {},
+    "ports": {
+        "8000/tcp": 8002
+      },
+    "ports_description": {
+        "8000/tcp": "Web Server port"
+    },
+    "schema": {}
+}

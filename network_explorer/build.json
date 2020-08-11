@@ -1,0 +1,8 @@
+{
+    "args": {},
+    "build_from": {
+        "aarch64": "hassioaddons/base-python-aarch64:5.2.1",
+        "armhf": "hassioaddons/base-python-armhf:5.2.1",
+        "armv7": "hassioaddons/base-python-armv7:5.2.1"
+    }
+  }
