@@ -1,9 +1,9 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, send_from_directory
 import requests
 
 app = Flask(__name__)
 HOST="0.0.0.0"
-PORT=8000
+PORT=8099
 
 def _proxy(*args, **kwargs):
     print(request.url, flush=True)
@@ -22,7 +22,7 @@ def _proxy(*args, **kwargs):
 
 @app.route('/admin')
 def httpserver():
-    return "Admin Page"
+    return send_from_directory("/html", "index.html")
 
 @app.route('/')
 def index():

@@ -12,10 +12,14 @@
     "privileged": ["NET_ADMIN","SYS_ADMIN","SYS_MODULE", "SYS_RESOURCE"],
     "options": {},
     "ports": {
-        "8000/tcp": 8002
+        "8099/tcp": 8002
       },
     "ports_description": {
-        "8000/tcp": "Web Server port"
+        "8099/tcp": "Web Server port"
     },
-    "schema": {}
+    "schema": {},
+    "panel_icon": "mdi:wrench",
+    "webui": "http://[HOST]:[PORT:8000]/admin",
+    "ingress": true,
+    "ingress_entry": "/admin"
 }

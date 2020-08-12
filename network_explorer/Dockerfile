@@ -4,7 +4,6 @@ FROM $BUILD_FROM
 ENV LANG C.UTF-8
 
 COPY requirements.txt /tmp/
-COPY run.py /
 
 RUN pip install \
     --no-cache-dir \
@@ -13,7 +12,8 @@ RUN pip install \
 
 RUN apk add --no-cache cifs-utils
 
-COPY run.sh /
+COPY rootfs /
+
 RUN chmod a+x /run.sh
 
 CMD [ "/run.sh" ]
