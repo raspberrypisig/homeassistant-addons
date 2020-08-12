@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Network Explorer</title>
+    <script>
+        window.addEventListener("DOMContentLoaded", function() {
+            var hostname = window.location.hostname;
+
+            var adminlink = document.getElementById("admin");
+            adminlink.href = "http://" + hostname + ":HOMEASSISTANTPORT/admin";
+            adminlink.innerText = admin.href;
+
+            var explorerlink = document.getElementById("explorer");
+            explorerlink.href = "http://" + hostname + ":HOMEASSISTANTPORT";
+            explorerlink.innerText = admin.href;
+        });
+
+
+    </script>
+</head>
+<body>
+  <h1>Network Explorer Addon for Home Assistant</h1>
+  <p>
+    Admin page: <a id="admin" target="_blank" ></a>
+  </p>
+  <p>
+    Network Explorer: <a id="explorer" target="_blank"></a>
+  </p>
+
+  
+
+</body>
+</html>

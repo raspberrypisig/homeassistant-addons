@@ -2,7 +2,7 @@
     "name": "Network Explorer",
     "version": "0.1",
     "slug": "network_explorer",
-    "url": "https://github.com/raspberrypisig/homeassistant-addons/network_explorer",
+    "url": "https://github.com/raspberrypisig/homeassistant-addons/tree/master/network_explorer",
     "description": "Explore network files and folders from HTTP requests.",
     "arch": ["armhf", "armv7", "aarch64"],
     "startup": "application",
@@ -21,5 +21,6 @@
     "panel_icon": "mdi:wrench",
     "webui": "http://[HOST]:[PORT:8000]/admin",
     "ingress": true,
-    "ingress_entry": "/admin"
+    "ingress_entry": "/homeassistant",
+    "hassio_api": true
 }

@@ -1,9 +1,13 @@
 from flask import Flask, request, Response, send_from_directory
 import requests
+import sys
+import os
 
 app = Flask(__name__)
 HOST="0.0.0.0"
 PORT=8099
+
+EXTERNALPORT=sys.argv[1]
 
 def _proxy(*args, **kwargs):
     print(request.url, flush=True)
@@ -19,6 +23,22 @@ def _proxy(*args, **kwargs):
 
     response = Response(resp.content, resp.status_code, headers)
     return response
+
+@app.route('/homeassistant')
+def homeassistant():
+    contents=''
+    with open('/html/panel.html','r') as f:
+        contents = f.read()
+    contents = contents.replace('HOMEASSISTANTPORT', EXTERNALPORT)
+    return contents
+
+@app.route('/static/js/<path:loc>')
+def staticjsfiles(loc):
+    return send_from_directory("/html/static/js", loc)
+
+@app.route('/static/css/<path:loc>')
+def staticcssfiles(loc):
+    return send_from_directory("/html/static/css", loc)
 
 @app.route('/admin')
 def httpserver():
