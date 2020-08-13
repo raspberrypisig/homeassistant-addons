@@ -11,7 +11,15 @@ function App() {
   });
   const onSubmit = data => {
     //alert(JSON.stringify(data));
-    append({Name: data.Name, NetworkPath: data.NetworkPath, NetworkType: data.NetworkType});
+    var networkshare = {Name: data.Name, NetworkPath: data.NetworkPath, NetworkType: data.NetworkType};
+    fetch('/admin/addnetworkshare', {
+      method: "post", 
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(request => request.body).then(data => console.log(data));
+
+    append(networkshare);
   };
 
   return (

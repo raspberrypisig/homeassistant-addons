@@ -40,6 +40,12 @@ def staticjsfiles(loc):
 def staticcssfiles(loc):
     return send_from_directory("/html/static/css", loc)
 
+@app.route('/admin/addnetworkshare', methods=['POST'])
+def addnetworkshare():
+    data = request.get_json(force=True)
+    print(data, flush=True)
+    return "Success"
+
 @app.route('/admin')
 def httpserver():
     return send_from_directory("/html", "index.html")
