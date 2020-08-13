@@ -16,7 +16,8 @@ function App() {
       method: "post", 
       headers: {
         "Content-Type": "application/json"
-      }
+      },
+      body: JSON.stringify(networkshare)
     }).then(request => request.body).then(data => console.log(data));
 
     append(networkshare);

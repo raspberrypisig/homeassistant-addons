@@ -42,8 +42,9 @@ def staticcssfiles(loc):
 
 @app.route('/admin/addnetworkshare', methods=['POST'])
 def addnetworkshare():
-    data = request.get_json(force=True)
-    print(data, flush=True)
+    print("it got here", flush=True)
+    #data = request.get_json(force=True)
+    #print(data, flush=True)
     return "Success"
 
 @app.route('/admin')
