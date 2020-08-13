@@ -41,13 +41,24 @@ def staticjsfiles(loc):
 def staticcssfiles(loc):
     return send_from_directory("/html/static/css", loc)
 
+@app.route('/admin/connect', methods=['POST'])
+def connect():
+    data = request.get_json(force=True)
+    result = subprocess.run(["/mountshare.sh", data['NetworkType'], data['NetworkPath'] , data['Name']])
+    return str(result)
+
+@app.route('/admin/disconnect/<mountdir>', methods=['POST'])
+def disconnect(mountdir):
+    result = subprocess.run(["/disconnect.sh", mountdir])
+    return str(result)
+
 @app.route('/admin/addnetworkshare', methods=['POST'])
 def addnetworkshare():
     data = request.get_json(force=True)
     print(data, flush=True)
     result = subprocess.run(["/mountshare.sh", data['NetworkType'], data['NetworkPath'] , data['Name']])
     print(result, flush=True)
-    return "Success"
+    return str(result.returncode)
 
 @app.route('/admin')
 def httpserver():

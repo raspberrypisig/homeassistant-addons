@@ -4,13 +4,13 @@ import './App.css';
 
 function App() {
 
-  const { register, handleSubmit, control } = useForm();
+  const { register, handleSubmit, control, setValue } = useForm();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "test"
   });
   const onSubmit = data => {
-    //alert(JSON.stringify(data));
+    //alert(JSON.stringify(data))
     var networkshare = {Name: data.Name, NetworkPath: data.NetworkPath, NetworkType: data.NetworkType};
     fetch('/admin/addnetworkshare', {
       method: "post", 
@@ -18,9 +18,13 @@ function App() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify(networkshare)
-    }).then(request => request.body).then(data => console.log(data));
+    }).then(response => response.text()).then(text => {
+      console.log(text);
+      text === "0"? networkshare['IsConnected'] = "true": networkshare['IsConnected'] = "false" ;
+      append(networkshare);
+    });
 
-    append(networkshare);
+
   };
 
   return (
@@ -44,6 +48,9 @@ function App() {
             <option value="cifs">Windows Share</option>
           </select>      
         </div>
+
+        <input name="IsConnected" type="hidden" class="" ref={register} />
+
         <input type="submit" />
       </form>
       <div>
@@ -51,17 +58,29 @@ function App() {
         {
           fields.map((item, index) => {
 
-          console.log(item)
-          console.log(index)
           return (
           <div>
             <span key={index}>
               {item.Name} {item.NetworkType} {item.NetworkPath}
             </span>
             <span>
-              <span class="dot"/>
-              <button onClick={()=> {console.log(index)}}>Connect</button>
-              <button onClick={()=> {console.log(index)}}>Disconnect</button>
+              Connected: {item.IsConnected}
+            </span>
+            <span>
+              <span class={`AppDot ${item.IsConnected ===  "true"?  "AppGreenDot": "AppRedDot"}`}/>
+              <button onClick={()=> {
+                fetch('/admin/connect', {
+                  method: "post",
+                  body: JSON.stringify({Name: `${item.Name}`, NetworkPath: `${item.NetworkPath}`, NetworkType: `${item.NetworkType}`})
+                });                
+                setValue(`test[${index}].IsConnected`, "true");
+              }}>Connect</button>
+              <button onClick={()=> {
+                fetch(`/admin/disconnect/${item.Name}`, {
+                  method: "post"
+                });
+                item.IsConnected = false;
+              }}>Disconnect</button>
               <button onClick={()=> remove(index)}>Remove</button>
             </span>
           </div>)

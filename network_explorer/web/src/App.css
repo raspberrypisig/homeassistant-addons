@@ -5,5 +5,20 @@
   color: #000000;
 }
 
+.AppDot {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.AppGreenDot {
+  background-color: green;
+}
+
+.AppRedDot {
+  background-color: red;
+}
+
 
 
