@@ -2,6 +2,7 @@ from flask import Flask, request, Response, send_from_directory
 import requests
 import sys
 import os
+import subprocess
 
 app = Flask(__name__)
 HOST="0.0.0.0"
@@ -44,6 +45,8 @@ def staticcssfiles(loc):
 def addnetworkshare():
     data = request.get_json(force=True)
     print(data, flush=True)
+    result = subprocess.run(["/mountshare.sh", data['NetworkType'], data['NetworkPath'] , data['Name']])
+    print(result, flush=True)
     return "Success"
 
 @app.route('/admin')
