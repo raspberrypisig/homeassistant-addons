@@ -4,11 +4,13 @@ import './App.css';
 
 function App() {
 
-  const { register, handleSubmit, control, setValue } = useForm();
+  const { register, handleSubmit, control, setValue, watch } = useForm();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "test"
   });
+  const test = watch("test");
+
   const onSubmit = data => {
     //alert(JSON.stringify(data))
     var networkshare = {Name: data.Name, NetworkPath: data.NetworkPath, NetworkType: data.NetworkType};
@@ -64,22 +66,21 @@ function App() {
               {item.Name} {item.NetworkType} {item.NetworkPath}
             </span>
             <span>
-              Connected: {item.IsConnected}
-            </span>
-            <span>
-              <span class={`AppDot ${item.IsConnected ===  "true"?  "AppGreenDot": "AppRedDot"}`}/>
+              <input class="AppInvisible" name={`test[${index}].circle`} ref={register()} />
+              <span class={`AppDot ${item.IsConnected ===  "false" || test?.[index]?.circle === "false" ?  "AppRedDot": "AppGreenDot"}`}></span>
               <button onClick={()=> {
                 fetch('/admin/connect', {
                   method: "post",
                   body: JSON.stringify({Name: `${item.Name}`, NetworkPath: `${item.NetworkPath}`, NetworkType: `${item.NetworkType}`})
                 });                
-                setValue(`test[${index}].IsConnected`, "true");
+                setValue(`test[${index}].circle`, "true");
               }}>Connect</button>
               <button onClick={()=> {
                 fetch(`/admin/disconnect/${item.Name}`, {
                   method: "post"
                 });
-                item.IsConnected = false;
+                //console.log(test[index]);
+                setValue(`test[${index}].circle`, "false");
               }}>Disconnect</button>
               <button onClick={()=> remove(index)}>Remove</button>
             </span>
