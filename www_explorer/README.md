@@ -27,11 +27,12 @@ Uses port 8000 by default, but this is configurable.
 http://<HOME_ASSISTANT_IP>:8000
 ```
 
+![Directory Listings](https://github.com/raspberrypisig/homeassistant-addons/raw/master/www_explorer/directorylisting.jpg)
 
 ### Directories under a subdiretory
 
 ```text
-http://<HOME_ASSISTANT_IP>:8000/directories/config/www/Music
+http://<HOME_ASSISTANT_IP>:8000/api/directories/config/www/Music
 ```
 
 The example layout would return **["Snoop Dogg", "Roxette"]**
@@ -39,7 +40,7 @@ The example layout would return **["Snoop Dogg", "Roxette"]**
 ### Files under a subdirectory
 
 ```text
-http://<HOME_ASSISTANT_IP>:8000/files/config/wwww/Music/Roxette
+http://<HOME_ASSISTANT_IP>:8000/api/files/config/wwww/Music/Roxette
 ```
 
 The example layout would return **["1980hits.txt", "boo.wav"]**
@@ -47,7 +48,7 @@ The example layout would return **["1980hits.txt", "boo.wav"]**
 ### Filter files under a directory
 
 ```text
-http://HOME_ASSISTANT_IP>:8000/files/config/www/Music/Snoop Dogg/filter/*.mp3
+http://HOME_ASSISTANT_IP>:8000/api/files/config/www/Music/Snoop Dogg/filter/*.mp3
 ```
 
 The example layout would return **["1.mp3", "2.mp3", "3.mp3"]**
@@ -55,12 +56,16 @@ The example layout would return **["1.mp3", "2.mp3", "3.mp3"]**
 ### Experimenting with glob
 
 ```text
-http://HOME_ASSISTANT_IP>:8000/files/Music/filter/**/*.wav
+http://HOME_ASSISTANT_IP>:8000/api/files/config/www/Music/filter/**/*.wav
 ```
 
-The example layout would return **["/config/www/Music/Roxette/boo.wav"]**
+The example layout would return **["boo.wav"]**
 
+```text
+http://HOME_ASSISTANT_IP>:8000/api/files/config/www/Music/filter/**/*.wav?out
+```
 
+The example layout would return **["config/www/Music/Roxette/boo.wav"]**
 
 
 
