@@ -1,14 +1,16 @@
 from pathlib import Path
 from flask import Flask, jsonify, request, Response
 import requests
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 BASEDIR = "."
 HOST="0.0.0.0"
 PORT=8000
 
+whitelist=["addons","config","share","backup", "ssl"]
+
 def _proxy(*args, **kwargs):
-    print(request.url, flush=True)
     resp = requests.request(
         method=request.method,
         url=request.url.replace(request.host_url, 'http://127.0.0.1/'),
@@ -71,7 +73,15 @@ def listSubdirectories(req='/'):
 
 @app.route('/')
 def index():
-    return _proxy()
+    r = requests.get('http://localhost')
+    soup = BeautifulSoup(r.text, "html.parser")
+    for s in soup.find_all('li'):
+        a = s.find('a')
+        href = a['href']
+        href = href[:-1]
+        if href  not in whitelist:
+            s.decompose()
+    return str(soup)
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
