@@ -72,8 +72,8 @@ function App() {
                 fetch('/admin/connect', {
                   method: "post",
                   body: JSON.stringify({Name: `${item.Name}`, NetworkPath: `${item.NetworkPath}`, NetworkType: `${item.NetworkType}`})
-                });                
-                setValue(`test[${index}].circle`, "true");
+                }).then(response => response.text()).then(text=>  {setValue(`test[${index}].circle`, text)});                
+               
               }}>Connect</button>
               <button onClick={()=> {
                 fetch(`/admin/disconnect/${item.Name}`, {

@@ -45,12 +45,14 @@ def staticcssfiles(loc):
 def connect():
     data = request.get_json(force=True)
     result = subprocess.run(["/mountshare.sh", data['NetworkType'], data['NetworkPath'] , data['Name']])
-    return str(result)
+    if result.returncode == 0:
+        return "true"
+    return "false"
 
 @app.route('/admin/disconnect/<mountdir>', methods=['POST'])
 def disconnect(mountdir):
-    result = subprocess.run(["/disconnect.sh", mountdir])
-    return str(result)
+    subprocess.run(["/disconnect.sh", mountdir])
+    return ""
 
 @app.route('/admin/addnetworkshare', methods=['POST'])
 def addnetworkshare():
