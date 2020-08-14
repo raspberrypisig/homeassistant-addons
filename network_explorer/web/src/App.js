@@ -67,7 +67,7 @@ function App() {
             </span>
             <span>
               <input class="AppInvisible" name={`test[${index}].circle`} ref={register()} />
-              <span class={`AppDot ${item.IsConnected ===  "false" || test?.[index]?.circle === "false" ?  "AppRedDot": "AppGreenDot"}`}></span>
+              <span class={`AppDot ${(item.IsConnected ===  "false" && test?.[index]?.circle === "")|| test?.[index]?.circle === "false" ?  "AppRedDot": "AppGreenDot"}`}></span>
               <button onClick={()=> {
                 fetch('/admin/connect', {
                   method: "post",
