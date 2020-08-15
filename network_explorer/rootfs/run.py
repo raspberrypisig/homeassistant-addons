@@ -84,6 +84,11 @@ def addnetworkshare():
         networkshares.add(data["NetworkType"],  data['NetworkPath'] , data['Name'])
     return str(result.returncode)
 
+@app.route('/admin/remove/<name>', methods=['POST'])
+def removenetworkshare(name):
+    networkshares.remove(name)
+
+
 @app.route('/admin')
 def httpserver():
     return send_from_directory("/html", "index.html")

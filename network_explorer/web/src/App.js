@@ -82,7 +82,13 @@ function App() {
                 //console.log(test[index]);
                 setValue(`test[${index}].circle`, "false");
               }}>Disconnect</button>
-              <button onClick={()=> remove(index)}>Remove</button>
+              <button onClick={()=> {
+                remove(index);
+                fetch(`/admin/remove/${item.Name}`, {
+                  method: "post"
+                });
+              } 
+              }>Remove</button>
             </span>
           </div>)
         })

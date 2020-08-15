@@ -2,7 +2,7 @@
 
 mountdir="$1"
 
-cd /config/network_shares
+cd /network_shares
 umount $mountdir
 exit
 
