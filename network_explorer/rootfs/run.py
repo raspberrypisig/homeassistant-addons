@@ -3,12 +3,34 @@ import requests
 import sys
 import os
 import subprocess
+import json
 
 app = Flask(__name__)
 HOST="0.0.0.0"
 PORT=8099
 
 EXTERNALPORT=sys.argv[1]
+
+networkshares = None
+
+class NetworkShares:
+    def __init__(self):
+        with open('/data/network_shares.json') as f:
+            self.shares = json.load(f)
+
+    def add(self, type, path, mountdir):
+        self.shares.append({
+          'type': type,
+          'path': path,
+          'name': mountdir
+        })
+        with open('/data/network_shares.json', 'w') as f:
+            json.dump(self.shares, f)
+
+    def remove(self, name):
+        self.shares = [i for i in self.shares if i['name'] != name]
+        with open('/data/network_shares.json', 'w') as f:
+            json.dump(self.shares, f)
 
 def _proxy(*args, **kwargs):
     print(request.url, flush=True)
@@ -57,9 +79,9 @@ def disconnect(mountdir):
 @app.route('/admin/addnetworkshare', methods=['POST'])
 def addnetworkshare():
     data = request.get_json(force=True)
-    print(data, flush=True)
     result = subprocess.run(["/mountshare.sh", data['NetworkType'], data['NetworkPath'] , data['Name']])
-    print(result, flush=True)
+    if result.returncode == 0:
+        networkshares.add(data["NetworkType"],  data['NetworkPath'] , data['Name'])
     return str(result.returncode)
 
 @app.route('/admin')
@@ -75,6 +97,10 @@ def index():
 def default(path):
     return _proxy()
 
+def loadSavedNetworkShares():
+    return NetworkShares()
+
 if __name__ == "__main__":
+    networkshares = loadSavedNetworkShares()
     app.run(host=HOST, port=PORT)
 
