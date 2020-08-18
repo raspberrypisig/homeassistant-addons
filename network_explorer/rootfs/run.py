@@ -63,6 +63,10 @@ def staticjsfiles(loc):
 def staticcssfiles(loc):
     return send_from_directory("/html/static/css", loc)
 
+@app.route('/admin/port', methods=['POST'])
+def port():
+    return EXTERNALPORT
+
 @app.route('/admin/connect', methods=['POST'])
 def connect():
     data = request.get_json(force=True)
