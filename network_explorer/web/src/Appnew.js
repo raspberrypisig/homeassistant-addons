@@ -62,7 +62,8 @@ function App() {
 
     },
     heading: {
-      margin: 'auto'
+      margin: 'auto',
+      paddingBottom: '2rem'
     },
     nopadding: {
       paddingLeft: 0
@@ -92,13 +93,27 @@ function App() {
     },
     explore: {
       textDecoration: 'none'
+    },
+    tablebold: {
+      fontWeight: 'bold'
     }
   }));
 
   const [shares, setShares] = useState([])
   const [advancedOptions, setAdvancedOptions] = useState(false)
 
+  const validateForm = (sharename, sharepath) => {
+    const b = shares.filter(a => a.sharename === sharename || a.sharepath === sharepath ? false: true);
+    return b.length === shares.length;
+  };
+
   function onSubmit(values) {
+    const isValid = validateForm(values["sharename"], values["sharepath"]);
+    if (!isValid) {
+      alert("Validation failed: duplicate entry for either share name or network location")
+      return false;
+    }
+
     if (values["sharetype"] === undefined) {
       values["sharetype"] = "cifs"
     }
@@ -129,6 +144,8 @@ function App() {
    const onExplore = (e) => {
      e.stopPropagation();
    };
+
+
 
   return (
 <Container component="main" maxWidth="xs">
@@ -194,6 +211,7 @@ function App() {
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1bh-content"
           id="panel1bh-header"
+          alignItems="center"
         >
           <Box className={classes.circle}>                    { item.isconnected &&
           <span className={classes.greencircle}></span>
@@ -204,11 +222,11 @@ function App() {
           </Box>
 
         <Box alignItems="center"  width="100%">
-          <Typography alignSelf="center">
+          <Typography>
           {item.sharename}
           </Typography>
         </Box>
-        <Box alignSelf="center" flexShrink={1}>
+        <Box flexShrink={1}>
           <a className={classes.explore} href="http://www.google.com" target="_blank"><Button variant="contained" color="secondary" onClick={onExplore}>Explore</Button></a>
           
         </Box>
@@ -218,21 +236,21 @@ function App() {
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell>Property</TableCell>
-                  <TableCell>Value</TableCell>
+                  <TableCell classes={{root: classes.tablebold}}>Property</TableCell>
+                  <TableCell classes={{root: classes.tablebold}}>Value</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
               <TableRow>
-                <TableCell>Share Name</TableCell>
+                <TableCell classes={{root: classes.tablebold}}>Share Name</TableCell>
                 <TableCell>{item.sharename}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>Share Location</TableCell>
+                <TableCell classes={{root: classes.tablebold}}>Share Location</TableCell>
                 <TableCell>{item.sharepath}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>Share Type</TableCell>
+                <TableCell classes={{root: classes.tablebold}}>Share Type</TableCell>
                 <TableCell>{item.sharetype}</TableCell>
               </TableRow>   
               </TableBody>                         
