@@ -8,17 +8,23 @@ import { Button,
          AccordionDetails, 
          AccordionSummary, 
          Container, 
-         Avatar, 
          CssBaseline, 
          Collapse, 
          IconButton,
-         Box 
+         Box,
+         Table,
+         TableBody,
+         TableCell,
+         TableContainer,
+         TableHead,
+         TableRow,
+         Paper
         } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Form } from 'react-final-form';
 import { TextField, Select } from 'mui-rff';
-import './App.css';
-import { ArrowRightAlt } from '@material-ui/icons';
+//import './App.css';
+
 
 
 function App() {
@@ -83,6 +89,9 @@ function App() {
     },
     circle: {
       paddingRight: '1rem'
+    },
+    explore: {
+      textDecoration: 'none'
     }
   }));
 
@@ -115,6 +124,10 @@ function App() {
    const onRemoveData = (id) => {
     const nextState = shares.filter(a => a.sharename === id ? false:true);
     setShares(nextState);
+   };
+
+   const onExplore = (e) => {
+     e.stopPropagation();
    };
 
   return (
@@ -195,12 +208,37 @@ function App() {
           {item.sharename}
           </Typography>
         </Box>
-        <Box alignSelf="center" flexShrink={1}>RIGHT</Box>
+        <Box alignSelf="center" flexShrink={1}>
+          <a className={classes.explore} href="http://www.google.com" target="_blank"><Button variant="contained" color="secondary" onClick={onExplore}>Explore</Button></a>
+          
+        </Box>
         </AccordionSummary>
         <AccordionDetails className={classes.displayblock}>
-          <Typography display="inline-block">Share Name: {item.sharename}</Typography>
-          <Typography display="inline-block">Share Location: {item.sharepath}</Typography>
-          <Typography display="inline-block">Share Type: {item.sharetype}</Typography>
+          <TableContainer component={Paper}>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Property</TableCell>
+                  <TableCell>Value</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+              <TableRow>
+                <TableCell>Share Name</TableCell>
+                <TableCell>{item.sharename}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Share Location</TableCell>
+                <TableCell>{item.sharepath}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Share Type</TableCell>
+                <TableCell>{item.sharetype}</TableCell>
+              </TableRow>   
+              </TableBody>                         
+            </Table>
+
+          </TableContainer>
           <Button display="inline-block" onClick={() => { onChangeData('isconnected', false, item.sharename)}}>Disconnect</Button>
           <Button display="inline-block" onClick={() => { onRemoveData(item.sharename)}}>Remove</Button>
         </AccordionDetails>
