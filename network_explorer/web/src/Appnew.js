@@ -1,5 +1,19 @@
 import React, {useState} from 'react';
-import { Button, Grid, makeStyles, Typography, MenuItem, Accordion, AccordionDetails, AccordionSummary, Container, Avatar, CssBaseline, Collapse, IconButton } from '@material-ui/core';
+import { Button, 
+         Grid, 
+         makeStyles, 
+         Typography, 
+         MenuItem, 
+         Accordion, 
+         AccordionDetails, 
+         AccordionSummary, 
+         Container, 
+         Avatar, 
+         CssBaseline, 
+         Collapse, 
+         IconButton,
+         Box 
+        } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Form } from 'react-final-form';
 import { TextField, Select } from 'mui-rff';
@@ -24,8 +38,10 @@ function App() {
       paddingTop: '2rem'
     },
     accordion: {
+      /*
       flexBasis: '33.33%',
       flexShrink: 0
+      */
     },
     submit: {
       marginTop: '32px',
@@ -52,18 +68,21 @@ function App() {
       height: '25px',
       width: '25px',
       borderRadius: '50%',
-      display: 'inline-block',
-      backgroundColor: 'red'
+      backgroundColor: 'red',
+      display: 'inherit'
     },
     greencircle: {
       height: '25px',
       width: '25px',
       borderRadius: '50%',
-      display: 'inline-block',
-      backgroundColor: 'green'
+      backgroundColor: 'green',
+      display: 'inherit'
     },
     nodisplay: {
       display: 'none'
+    },
+    circle: {
+      paddingRight: '1rem'
     }
   }));
 
@@ -163,15 +182,20 @@ function App() {
           aria-controls="panel1bh-content"
           id="panel1bh-header"
         >
-          <Typography className={classes.accordion} > 
-          { item.isconnected &&
+          <Box className={classes.circle}>                    { item.isconnected &&
           <span className={classes.greencircle}></span>
           }
           { !item.isconnected &&
           <span className={classes.redcircle}></span> 
-          }
+          } 
+          </Box>
+
+        <Box alignItems="center"  width="100%">
+          <Typography alignSelf="center">
           {item.sharename}
           </Typography>
+        </Box>
+        <Box alignSelf="center" flexShrink={1}>RIGHT</Box>
         </AccordionSummary>
         <AccordionDetails className={classes.displayblock}>
           <Typography display="inline-block">Share Name: {item.sharename}</Typography>
