@@ -239,7 +239,7 @@ function App() {
           </Typography>
         </Box>
         <Box flexShrink={1}>
-          <a className={classes.explore} href="http://www.google.com" target="_blank"><Button variant="contained" color="secondary" onClick={onExplore}>Explore</Button></a>
+          <a className={classes.explore} href={`/${item.sharename}`} target="_blank"><Button variant="contained" color="secondary" onClick={onExplore}>Explore</Button></a>
           
         </Box>
         </AccordionSummary>
