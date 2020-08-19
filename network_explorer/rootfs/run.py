@@ -17,18 +17,32 @@ class NetworkShares:
     def __init__(self):
         with open('/data/network_shares.json') as f:
             self.shares = json.load(f)
+        
+
+    def reconnect(self):
+        for share in self.shares:
+            result = subprocess.run(["/ismounted.sh", share['sharetype'], share['sharepath'], share['sharename']])
+            if result.returncode == 0:
+                share['isconnected'] = True
+            else:
+                share['isconnected'] = False
+                result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename']])
+                if result.returncode == 0:
+                    share['isconnected'] = True
+
+        print("Reconnect:" + str(self.shares), flush=True)
 
     def add(self, type, path, mountdir):
         self.shares.append({
-          'type': type,
-          'path': path,
-          'name': mountdir
+          'sharetype': type,
+          'sharepath': path,
+          'sharename': mountdir
         })
         with open('/data/network_shares.json', 'w') as f:
             json.dump(self.shares, f)
 
     def remove(self, name):
-        self.shares = [i for i in self.shares if i['name'] != name]
+        self.shares = [i for i in self.shares if i['sharename'] != name]
         with open('/data/network_shares.json', 'w') as f:
             json.dump(self.shares, f)
 
@@ -63,9 +77,15 @@ def staticjsfiles(loc):
 def staticcssfiles(loc):
     return send_from_directory("/html/static/css", loc)
 
-@app.route('/admin/port', methods=['POST'])
-def port():
-    return EXTERNALPORT
+@app.route('/admin/shares', methods=['GET'])
+def getShares():
+    networkshares.reconnect()
+    result = json.dumps(networkshares.shares, default = lambda x: x.__dict__)
+    print("AdminShares:" + result, flush=True)
+    resp = Response(result)
+    resp.headers['Content-Type'] = 'application/json'
+    return resp
+
 
 @app.route('/admin/connect', methods=['POST'])
 def connect():
@@ -111,5 +131,6 @@ def loadSavedNetworkShares():
 
 if __name__ == "__main__":
     networkshares = loadSavedNetworkShares()
+    networkshares.reconnect()
     app.run(host=HOST, port=PORT)
 

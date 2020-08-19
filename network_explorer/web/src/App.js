@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Button, 
          Grid, 
          makeStyles, 
@@ -101,6 +101,10 @@ function App() {
 
   const [shares, setShares] = useState([])
   const [advancedOptions, setAdvancedOptions] = useState(false)
+
+  useEffect(() => {
+    fetch('/admin/shares').then(response => response.json()).then(text => {console.log(text); setShares(text);} );
+  }, []);
 
   const validateForm = (sharename, sharepath) => {
     const b = shares.filter(a => a.sharename === sharename || a.sharepath === sharepath ? false: true);
