@@ -70,7 +70,7 @@ def port():
 @app.route('/admin/connect', methods=['POST'])
 def connect():
     data = request.get_json(force=True)
-    result = subprocess.run(["/mountshare.sh", data['NetworkType'], data['NetworkPath'] , data['Name']])
+    result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename']])
     if result.returncode == 0:
         return "true"
     return "false"
@@ -83,9 +83,9 @@ def disconnect(mountdir):
 @app.route('/admin/addnetworkshare', methods=['POST'])
 def addnetworkshare():
     data = request.get_json(force=True)
-    result = subprocess.run(["/mountshare.sh", data['NetworkType'], data['NetworkPath'] , data['Name']])
+    result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename']])
     if result.returncode == 0:
-        networkshares.add(data["NetworkType"],  data['NetworkPath'] , data['Name'])
+        networkshares.add(data["sharetype"],  data['sharepath'] , data['sharename'])
     return str(result.returncode)
 
 @app.route('/admin/remove/<name>', methods=['POST'])

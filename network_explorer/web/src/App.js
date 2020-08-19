@@ -118,9 +118,21 @@ function App() {
       values["sharetype"] = "cifs"
     }
     values["key"] = values["sharename"];
-    values["isconnected"] = true;
-    console.log(values);
-    setShares([...shares, values]);
+    values["isconnected"] = false;
+
+    const networkshare = {sharename: values["sharename"], sharetype: values["sharetype"], sharepath: values["sharepath"]};
+    console.log(networkshare);
+
+    fetch('/admin/addnetworkshare', {
+      method: "post", 
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(networkshare)
+    }).then(response => response.text()).then(text => {
+      text === "0"? values["isconnected"] = true: values["isconnected"] = false;
+      setShares([...shares, values]);
+    });
   }
 
   const classes = useStyles();
