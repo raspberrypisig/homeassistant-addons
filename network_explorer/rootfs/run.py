@@ -21,7 +21,7 @@ class NetworkShares:
 
     def reconnect(self):
         for share in self.shares:
-            result = subprocess.run(["/ismounted.sh", share['sharetype'], share['sharepath'], share['sharename']])
+            result = subprocess.run(["/ismounted.sh", share['sharename']])
             if result.returncode == 0:
                 share['isconnected'] = True
             else:
@@ -35,7 +35,10 @@ class NetworkShares:
     def connect(self, index):
         result = subprocess.run(["/mountshare.sh", self.shares[index]['sharetype'], self.shares[index]['sharepath'], self.shares[index]['sharename']])
         if result.returncode == 0:
+            self.shares[index]["isconnected"] = True
             return True
+
+        self.shares[index]["isconnected"] = False
         return False
       
 
@@ -53,10 +56,6 @@ class NetworkShares:
         self.shares = [i for i in self.shares if i['sharename'] != name]
         with open('/data/network_shares.json', 'w') as f:
             json.dump(self.shares, f)
-
-    def updateTrue(self, sharetype, path, name):
-        i = [x for x in self.shares if x['sharename'] == name][0]
-        i['isconnected'] = True
 
 def _proxy(*args, **kwargs):
     print(request.url, flush=True)
@@ -104,7 +103,6 @@ def connect():
     data = request.get_json(force=True)
     result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename']])
     if result.returncode == 0:
-        networkshares.updateTrue(data['sharetype'], data['sharepath'] , data['sharename'])
         return "0"
     return "1"
 

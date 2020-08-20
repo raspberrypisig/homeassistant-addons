@@ -15,5 +15,6 @@
     "ports_description": {
         "8000/tcp": "Web Server port"
     },
-    "schema": {}
+    "schema": {},
+    "webui": "http://[HOST]:[PORT:8000]"
 }

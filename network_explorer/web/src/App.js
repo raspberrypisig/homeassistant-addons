@@ -299,7 +299,6 @@ function App() {
             </Table>
 
           </TableContainer>
-          <Button display="inline-block" onClick={() => { onChangeData('isconnected', false, item.sharename)}}>Disconnect</Button>
           <Button display="inline-block" onClick={() => { onRemoveData(item.sharename)}}>Remove</Button>
         </AccordionDetails>
       </Accordion>

@@ -1,10 +1,9 @@
 #!/usr/bin/with-contenv bashio
 
-sharetype="$1"
-sharepath="$2"
-mountdir="$3"
+mountdir="$1"
 
-echo "type: $sharetype path=$sharepath dir=$mountdir"
-grep $sharetype /etc/mtab | grep $sharepath | grep $mountdir 
+echo "ismounted=$mountdir"
+cat /etc/mtab
+grep "/network_shares/$mountdir" /etc/mtab
 exit
 
