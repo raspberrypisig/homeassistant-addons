@@ -161,7 +161,28 @@ function App() {
      e.stopPropagation();
    };
 
+   const onConnect = (index) => (e) => {
 
+    e.stopPropagation();    
+
+    let share = {sharename: shares[index]['sharename'], sharetype: shares[index]['sharetype'], sharepath: shares[index]['sharepath']};
+
+     fetch('/admin/connect', {
+      method: "post", 
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(share)       
+     }).then(response => response.text()).then(text => {
+       console.log("Mounted: " + text);
+       if (text === "0" ) {
+          share['isconnected'] = true;
+          const newShares = shares.map(item => item['sharename'] === share['sharename']? share: item);
+          console.log(newShares);
+          setShares(newShares);
+       }
+     });
+   };
 
   return (
 <Container component="main" maxWidth="xs">
@@ -243,9 +264,14 @@ function App() {
           </Typography>
         </Box>
         <Box flexShrink={1}>
+          { item.isconnected &&
           <a className={classes.explore} href={`/${item.sharename}`} target="_blank"><Button variant="contained" color="secondary" onClick={onExplore}>Explore</Button></a>
-          
+          }
+          { !item.isconnected &&
+          <a className={classes.explore}><Button color="primary" onClick={onConnect(index)}>Connect</Button></a>
+          }       
         </Box>
+        
         </AccordionSummary>
         <AccordionDetails className={classes.displayblock}>
           <TableContainer component={Paper}>
