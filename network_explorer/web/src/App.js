@@ -153,8 +153,12 @@ function App() {
    };
 
    const onRemoveData = (id) => {
+    const removedShare = shares.filter(a => a.sharename === id ? true:false);
     const nextState = shares.filter(a => a.sharename === id ? false:true);
     setShares(nextState);
+    fetch('/admin/remove/' + removedShare[0]['sharename'], {
+      method: "post"
+    }).then(response => response.text()).then(text=>{});
    };
 
    const onExplore = (e) => {
