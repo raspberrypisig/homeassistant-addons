@@ -134,8 +134,14 @@ function App() {
       },
       body: JSON.stringify(networkshare)
     }).then(response => response.text()).then(text => {
-      text === "0"? values["isconnected"] = true: values["isconnected"] = false;
-      setShares([...shares, values]);
+      if (text === "0") {
+        values["isconnected"] = true;
+        setShares([...shares, values]);
+      }
+      else {
+        alert("Sorry. Can't connect to share. Double-check network details");
+      }
+
     });
   }
 
