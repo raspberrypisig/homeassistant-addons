@@ -138,7 +138,7 @@ def index():
 def default(path):
     hasExtension = Path(path).suffix.startswith(".")
     if hasExtension:
-        return send_file(path, conditional=True)   
+        return send_file("/network_shares" +  path, conditional=True)   
     return _proxy()
 
 def loadSavedNetworkShares():
