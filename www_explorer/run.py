@@ -1,5 +1,5 @@
 from pathlib import Path
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, send_file
 import requests
 from bs4 import BeautifulSoup
 
@@ -86,6 +86,9 @@ def index():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def default(path):
+    hasExtension = Path(path).suffix.startswith(".")
+    if hasExtension:
+        return send_file(path, conditional=True)
     return _proxy()
     
 

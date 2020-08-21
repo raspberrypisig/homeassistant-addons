@@ -134,7 +134,7 @@ def index():
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def default(path):
+def default(path):    
     return _proxy()
 
 def loadSavedNetworkShares():
