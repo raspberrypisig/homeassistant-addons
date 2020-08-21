@@ -1,9 +1,10 @@
-from flask import Flask, request, Response, send_from_directory
+from flask import Flask, request, Response, send_from_directory, send_file
 import requests
 import sys
 import os
 import subprocess
 import json
+from pathlib import Path
 
 app = Flask(__name__)
 HOST="0.0.0.0"
@@ -134,7 +135,10 @@ def index():
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def default(path):    
+def default(path):
+    hasExtension = Path(path).suffix.startswith(".")
+    if hasExtension:
+        return send_file(path, conditional=True)   
     return _proxy()
 
 def loadSavedNetworkShares():
@@ -143,5 +147,6 @@ def loadSavedNetworkShares():
 if __name__ == "__main__":
     networkshares = loadSavedNetworkShares()
     networkshares.reconnect()
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
     app.run(host=HOST, port=PORT)
 
