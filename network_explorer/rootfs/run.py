@@ -115,7 +115,11 @@ def disconnect(mountdir):
 @app.route('/admin/addnetworkshare', methods=['POST'])
 def addnetworkshare():
     data = request.get_json(force=True)
-    result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename']])
+    if data['guest']:        
+        result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename']])
+    else:
+        result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename'], data['username'], data['password']])
+    
     if result.returncode == 0:
         networkshares.add(data["sharetype"],  data['sharepath'] , data['sharename'])
     return str(result.returncode)

@@ -119,15 +119,19 @@ function App() {
       return false;
     }
 
-    console.log(values);
+
 
     if (values["sharetype"] === undefined) {
       values["sharetype"] = "cifs"
     }
     values["key"] = values["sharename"];
-    values["isconnected"] = false;
+    values["isconnected"] = false;  
+    values["guest"] = guest;
 
-    const networkshare = {sharename: values["sharename"], sharetype: values["sharetype"], sharepath: values["sharepath"]};
+
+    
+
+    const networkshare = {sharename: values["sharename"], sharetype: values["sharetype"], sharepath: values["sharepath"], guest: values["guest"], username: values["username"], password: values["password"]};
     console.log(networkshare);
 
     fetch('/admin/addnetworkshare', {
