@@ -22,7 +22,7 @@ import { Button,
         } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Form } from 'react-final-form';
-import { TextField, Select } from 'mui-rff';
+import { TextField, Select, Checkboxes, CheckboxData } from 'mui-rff';
 //import './App.css';
 
 
@@ -101,6 +101,7 @@ function App() {
 
   const [shares, setShares] = useState([])
   const [advancedOptions, setAdvancedOptions] = useState(false)
+  const [guest, setGuest] = useState(false)
 
   useEffect(() => {
     fetch('/admin/shares').then(response => response.json()).then(text => {console.log(text); setShares(text);} );
@@ -117,6 +118,8 @@ function App() {
       alert("Validation failed: duplicate entry for either share name or network location")
       return false;
     }
+
+    console.log(values);
 
     if (values["sharetype"] === undefined) {
       values["sharetype"] = "cifs"
@@ -145,6 +148,8 @@ function App() {
     });
   }
 
+  const guestAccess = [ {label: 'Anonymous Access', value: false}];
+
   const classes = useStyles();
 
   const [expanded, setExpanded] = React.useState(false);
@@ -157,6 +162,10 @@ function App() {
     const nextState = shares.map(a => a.sharename === id ? { ...a, [key]: value } : a);
     setShares(nextState);
    };
+
+  const guestChanged = () => (event) => {
+    setGuest(!guest);
+  }
 
    const onRemoveData = (id) => {
     const removedShare = shares.filter(a => a.sharename === id ? true:false);
@@ -223,7 +232,31 @@ function App() {
             </Grid>
 
             <Grid item xs={12}  className={classes.share}>
-
+              <Checkboxes
+                 label=""
+                 name="guest"
+                 required={false}
+                 data={guestAccess}
+                 checked={guest}
+                 onChange={guestChanged()}
+              /> 
+              { !guest &&
+              <div>
+              <TextField className={classes.textfield}  label="Username" name="username" helperText="" required={false}             variant="outlined"
+            margin="normal" InputProps={{
+              classes: {
+                input: classes.textfield,
+              },
+            }} color="primary" />
+              <TextField className={classes.textfield}  label="Password" name="password" helperText="" required={false}             variant="outlined"
+            margin="normal" InputProps={{
+              classes: {
+                input: classes.textfield,
+              },
+            }} color="primary" />                                    
+          </div>
+          }
+          
             </Grid>
           
             <Grid item xs={12}>

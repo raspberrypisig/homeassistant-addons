@@ -123,6 +123,8 @@ def addnetworkshare():
 @app.route('/admin/remove/<name>', methods=['POST'])
 def removenetworkshare(name):
     networkshares.remove(name)
+    subprocess.run(["/umountshare.sh", name])
+    return ""
 
 
 @app.route('/admin')

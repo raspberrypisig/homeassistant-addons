@@ -14,7 +14,7 @@ RUN apk add --no-cache cifs-utils
 
 COPY rootfs /
 
-RUN chmod a+x /run.sh
+RUN chmod a+x /*.sh
 
 CMD [ "/run.sh" ]
 
