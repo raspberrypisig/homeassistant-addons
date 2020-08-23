@@ -112,7 +112,7 @@ function App() {
     return b.length === shares.length;
   };
 
-  function onSubmit(values) {
+  function onSubmit(values, form) {
     const isValid = validateForm(values["sharename"], values["sharepath"]);
     if (!isValid) {
       alert("Validation failed: duplicate entry for either share name or network location")
@@ -128,9 +128,6 @@ function App() {
     values["isconnected"] = false;  
     values["guest"] = guest;
 
-
-    
-
     const networkshare = {sharename: values["sharename"], sharetype: values["sharetype"], sharepath: values["sharepath"], guest: values["guest"], username: values["username"], password: values["password"]};
     console.log(networkshare);
 
@@ -144,6 +141,7 @@ function App() {
       if (text === "0") {
         values["isconnected"] = true;
         setShares([...shares, values]);
+        setTimeout(form.restart);
       }
       else {
         alert("Sorry. Can't connect to share. Double-check network details");

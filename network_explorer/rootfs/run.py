@@ -73,6 +73,10 @@ def _proxy(*args, **kwargs):
     response = Response(resp.content, resp.status_code, headers)
     return response
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_file("/html/favicon.ico")
+
 @app.route('/homeassistant')
 def homeassistant():
     contents=''
