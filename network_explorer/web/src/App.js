@@ -38,7 +38,8 @@ function App() {
     textfield:{
       fontFamily: 'Arial, sans-serif',
       letterSpacing: '0.5px',
-      lineHeight: '2rem'
+      lineHeight: '2rem',
+      fontSize: '24px'
     },
     share: {
       paddingTop: '2rem'
@@ -96,6 +97,12 @@ function App() {
     },
     tablebold: {
       fontWeight: 'bold'
+    },
+    helpertext: {
+      fontSize: '20px'
+    },
+    remove: {
+      color: 'red'
     }
   }));
 
@@ -218,19 +225,39 @@ function App() {
           <Typography component="h1" variant="h5" className={classes.heading}>Add Network Shares</Typography>
             <Grid item xs={12}  className={classes.textfield}>
               <TextField type="text" label="Share Name" name="sharename" helperText="eg. Music" required={true} variant="outlined"
-            margin="normal"           InputProps={{
+            margin="normal"           
+            InputProps={{
               classes: {
                 input: classes.textfield,
               },
-            }} />
+            }} 
+            InputLabelProps={{
+              classes: {
+                label: classes.helpertext
+              }
+            }}
+            FormHelperTextProps={{
+              className: classes.helpertext
+            }}
+            />
             </Grid>
             <Grid item xs={12} >
               <TextField className={classes.textfield}  label="Network Location" name="sharepath" helperText="eg. //192.168.1.10/Music" required={true}             variant="outlined"
-            margin="normal" InputProps={{
+            margin="normal" 
+            InputProps={{
               classes: {
                 input: classes.textfield,
               },
-            }} color="primary" />
+            }} 
+            InputLabelProps={{
+              classes: {
+                label: classes.helpertext
+              }
+            }}            
+            FormHelperTextProps={{
+              className: classes.helpertext
+            }}
+            color="primary" />
             </Grid>
 
             <Grid item xs={12}  className={classes.share}>
@@ -344,7 +371,7 @@ function App() {
             </Table>
 
           </TableContainer>
-          <Button display="inline-block" onClick={() => { onRemoveData(item.sharename)}}>Remove</Button>
+          <Button classes={{root: classes.remove}} display="inline-block" onClick={() => { onRemoveData(item.sharename)}}>Remove</Button>
         </AccordionDetails>
       </Accordion>
       </Grid>
