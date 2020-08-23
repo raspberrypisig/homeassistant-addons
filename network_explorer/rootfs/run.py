@@ -124,14 +124,27 @@ def listDir(basedir, requestedPath):
 def listSubdirectories(req=""):
     return listDir(BASEDIR, req)
 
-def listFiles(basedir, requestedPath):
+def isFile(elem):
+    if elem.is_file():
+        return True
+    else:
+        return False
+
+def listFiles(basedir, requestedPath, glob="*"):
   basepath = Path(basedir)
   p = basepath.joinpath(requestedPath)
   if p.is_dir():
-      directories =  [modifyURLDir(x, basepath) for x in p.iterdir() if x.is_file()]
-      return jsonify(directories)
+      files = list(p.glob(glob))
+      files = list(filter(isFile, files)) 
+      files = [modifyURLDir(x, basepath)  for x in files]
+      return jsonify(files)
   else:
       return jsonify([])
+
+@app.route('/api/files/<path:req>/filter/<path:glob>')
+def listSelectedFilesInPath(req, glob):
+    return listFiles(BASEDIR, req, glob)
+
 
 @app.route('/api/files/')
 @app.route('/api/files/<path:req>')
