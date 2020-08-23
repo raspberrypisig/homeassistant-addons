@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, send_from_directory, send_file
+from flask import Flask, request, Response, send_from_directory, send_file, jsonify
 import requests
 import sys
 import os
@@ -11,6 +11,7 @@ HOST="0.0.0.0"
 PORT=8099
 
 EXTERNALPORT=sys.argv[1]
+BASEDIR="/network_shares/"
 
 networkshares = None
 
@@ -101,6 +102,41 @@ def staticjsfiles(loc):
 @app.route('/static/css/<path:loc>')
 def staticcssfiles(loc):
     return send_from_directory("/html/static/css", loc)
+
+def modifyURLDir(elem, basepath):
+    return {
+        "short": elem.name,
+        "path": str(elem.relative_to(basepath)),
+        "full": f"http://{request.host}/{str(elem.relative_to(basepath))}"
+    }
+
+def listDir(basedir, requestedPath):
+  basepath = Path(basedir)
+  p = basepath.joinpath(requestedPath)
+  if p.is_dir():
+      directories =  [modifyURLDir(x, basepath) for x in p.iterdir() if x.is_dir()]
+      return jsonify(directories)
+  else:
+      return jsonify([])
+
+@app.route('/api/directories/')
+@app.route('/api/directories/<path:req>')
+def listSubdirectories(req=""):
+    return listDir(BASEDIR, req)
+
+def listFiles(basedir, requestedPath):
+  basepath = Path(basedir)
+  p = basepath.joinpath(requestedPath)
+  if p.is_dir():
+      directories =  [modifyURLDir(x, basepath) for x in p.iterdir() if x.is_file()]
+      return jsonify(directories)
+  else:
+      return jsonify([])
+
+@app.route('/api/files/')
+@app.route('/api/files/<path:req>')
+def getFiles(req=""):
+    return listFiles(BASEDIR, req)
 
 @app.route('/admin/shares', methods=['GET'])
 def getShares():
