@@ -27,14 +27,20 @@ class NetworkShares:
                 share['isconnected'] = True
             else:
                 share['isconnected'] = False
-                result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename']])
+                if share['guest']:
+                    result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename']])
+                else:
+                    result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename'], share['username'], share['password']])
                 if result.returncode == 0:                    
                     share['isconnected'] = True
 
         print("Reconnect:" + str(self.shares), flush=True)
 
     def connect(self, index):
-        result = subprocess.run(["/mountshare.sh", self.shares[index]['sharetype'], self.shares[index]['sharepath'], self.shares[index]['sharename']])
+        if self.shares[index]['guest']:
+            result = subprocess.run(["/mountshare.sh", self.shares[index]['sharetype'], self.shares[index]['sharepath'], self.shares[index]['sharename']])
+        else:
+            result = subprocess.run(["/mountshare.sh", self.shares[index]['sharetype'], self.shares[index]['sharepath'], self.shares[index]['sharename'], self.shares[index]['username'], self.shares[index]['password']])
         if result.returncode == 0:
             self.shares[index]["isconnected"] = True
             return True
@@ -44,11 +50,14 @@ class NetworkShares:
       
 
 
-    def add(self, type, path, mountdir):
+    def add(self, type, path, mountdir, guest, username=None, password=None):
         self.shares.append({
           'sharetype': type,
           'sharepath': path,
-          'sharename': mountdir
+          'sharename': mountdir,
+          'guest': guest,
+          'username': username,
+          'password': password
         })
         with open('/data/network_shares.json', 'w') as f:
             json.dump(self.shares, f)
@@ -125,7 +134,10 @@ def addnetworkshare():
         result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename'], data['username'], data['password']])
     
     if result.returncode == 0:
-        networkshares.add(data["sharetype"],  data['sharepath'] , data['sharename'])
+        if data['guest']:
+            networkshares.add(data["sharetype"],  data['sharepath'] , data['sharename'], data['guest'])
+        else:
+            networkshares.add(data["sharetype"],  data['sharepath'] , data['sharename'], data['guest'], data['username'], data['password'])
     return str(result.returncode)
 
 @app.route('/admin/remove/<name>', methods=['POST'])
