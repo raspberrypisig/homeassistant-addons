@@ -193,19 +193,13 @@ function App() {
 
     e.stopPropagation();    
 
-    let share = {sharename: shares[index]['sharename'], sharetype: shares[index]['sharetype'], sharepath: shares[index]['sharepath']};
+    //let share = {sharename: shares[index]['sharename'], sharetype: shares[index]['sharetype'], sharepath: shares[index]['sharepath'], guest: shares[index]["guest"], username: shares[index]["username"], password: shares[index]["password"]};
 
-     fetch('/admin/connect', {
-      method: "post", 
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(share)       
-     }).then(response => response.text()).then(text => {
+     fetch(`/admin/connect/${shares[index]["sharename"]}`).then(response => response.text()).then(text => {
        console.log("Mounted: " + text);
        if (text === "0" ) {
-          share['isconnected'] = true;
-          const newShares = shares.map(item => item['sharename'] === share['sharename']? share: item);
+          shares[index]['isconnected'] = true;
+          const newShares = [...shares];
           console.log(newShares);
           setShares(newShares);
        }

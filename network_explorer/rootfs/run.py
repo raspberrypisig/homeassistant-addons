@@ -37,16 +37,32 @@ class NetworkShares:
 
         print("Reconnect:" + str(self.shares), flush=True)
 
-    def connect(self, index):
-        if self.shares[index]['guest']:
-            result = subprocess.run(["/mountshare.sh", self.shares[index]['sharetype'], self.shares[index]['sharepath'], self.shares[index]['sharename']])
+    def getShareFromName(self, sharename):
+        return next(filter(lambda x: x['sharename'] == sharename, self.shares), None)
+
+    def getIndexFromShareName(self, sharename):
+        for index,share in enumerate(self.shares):
+            if share["sharename"] == sharename:
+                return index
+        return -1
+
+    def update(self, sharename, key, value):
+        index = self.getIndexFromShareName(sharename)
+        if index >= 0 :
+            self.shares[index][key] = value
+
+    def connect(self, sharename):
+        share = self.getShareFromName(sharename)
+
+        if share['guest']:
+            result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename']])
         else:
-            result = subprocess.run(["/mountshare.sh", self.shares[index]['sharetype'], self.shares[index]['sharepath'], self.shares[index]['sharename'], self.shares[index]['username'], self.shares[index]['password']])
+            result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename'], share['username'], share['password']])
         if result.returncode == 0:
-            self.shares[index]["isconnected"] = True
+            self.update(sharename, "isconnected", True)
             return True
 
-        self.shares[index]["isconnected"] = False
+        self.update(sharename, "isconnected", False)
         return False
       
 
@@ -161,11 +177,11 @@ def getShares():
     return resp
 
 
-@app.route('/admin/connect', methods=['POST'])
-def connect():
-    data = request.get_json(force=True)
-    result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename']])
-    if result.returncode == 0:
+@app.route('/admin/connect/<sharename>')
+def connect(sharename):
+    result = networkshares.connect(sharename)
+    #result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename']])
+    if result:
         return "0"
     return "1"
 
