@@ -1,8 +1,8 @@
 {
     "args": {},
     "build_from": {
-        "aarch64": "hassioaddons/base-python-aarch64:5.2.1",
-        "armhf": "hassioaddons/base-python-armhf:5.2.1",
-        "armv7": "hassioaddons/base-python-armv7:5.2.1"
+        "aarch64": "homeassistant/aarch64-base-python:3.7-alpine3.12",
+        "armhf": "homeassistant/armhf-base-python:3.8-alpine3.12",
+        "armv7": "homeassistant/armhf-base-python:3.8-alpine3.12"
     }
   }

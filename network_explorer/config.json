@@ -1,15 +1,15 @@
 {
     "name": "Network Explorer",
-    "version": "0.2",
+    "version": "0.2.2",
     "slug": "network_explorer",
     "url": "https://github.com/raspberrypisig/homeassistant-addons/tree/master/network_explorer",
     "description": "Explore network files and folders from HTTP requests.",
     "arch": ["armhf", "armv7", "aarch64"],
     "startup": "application",
     "boot": "auto",
-    "map": ["config:rw"],
-    "full_access": true,
-    "privileged": ["NET_ADMIN","SYS_ADMIN","SYS_MODULE", "SYS_RESOURCE"],
+    "map": [],
+    "full_access": false,
+    "privileged": ["SYS_ADMIN", "DAC_READ_SEARCH"],
     "options": {},
     "ports": {
         "8099/tcp": 8002
@@ -22,5 +22,5 @@
     "webui": "http://[HOST]:[PORT:8000]/admin",
     "ingress": true,
     "ingress_entry": "/homeassistant",
-    "hassio_api": true
+    "hassio_api": false
 }
