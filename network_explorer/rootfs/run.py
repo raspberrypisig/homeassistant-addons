@@ -119,6 +119,21 @@ def staticjsfiles(loc):
 def staticcssfiles(loc):
     return send_from_directory("/html/static/css", loc)
 
+@app.route('/cast')
+def cast():
+    contents=''
+    with open('/html/cast/index.html','r') as f:
+        contents = f.read()
+    return contents
+
+@app.route('/cast/static/js/<path:loc>')
+def caststaticjsfiles(loc):
+    return send_from_directory("/html/cast/static/js", loc)
+
+@app.route('/cast/static/css/<path:loc>')
+def caststaticcssfiles(loc):
+    return send_from_directory("/html/cast/static/css", loc)
+
 def modifyURLDir(elem, basepath):
     return {
         "short": elem.name,

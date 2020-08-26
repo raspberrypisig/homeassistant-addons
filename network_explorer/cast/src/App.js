@@ -9,32 +9,18 @@ function App() {
 const [files, setFiles] = useState([]);
 const [folderChain, setFolderChain] = useState([{id: '/', name: 'Network Shares'}]);
 
-
-
-useEffect( () => {
-  setFiles([{id:'/test', name: 'test', isDir: true}, {id:'/boo', name: 'boo', isDir: true}, {id:'/moo.mp3', name: 'moo.mp3'}]);
-}, []);
-
-  /*
-  const folderChain = React.useMemo(
-    () => [
-        { id: 'xXre', name: 'Network Shares' },
-    ],
-    []
-);
-
-const files = React.useMemo(
-    () => [
-        { id: '1eBr', name: 'index.html' },
-        { id: 'xmFe', name: 'styles.css' },
-        { id: 'vEgS', name: 'scripts.js' },
-        { id: 'BVwA', name: 'favicon.ico' },
-        { id: 'VsdE', name: 'robots.txt' },
-        { id: '/test', name: 'test', isDir: true},
-    ],
-    []
-);
-*/
+useEffect(()=> {
+  console.log("effect in affect.");
+  fetch('/api/directories').then(response => response.json() ).then(json => {
+    let files = [];
+    json.map(x => {
+      const id = x['full'];
+      const name = x['short'];
+      files.push({id: id, name: name, isDir: true});
+    });
+    setFiles(files);
+  });
+},  [folderChain]);
 
 const handleFileAction = (action, data) => {
   if (action.id === "change_selection") {
@@ -67,17 +53,6 @@ const handleFileAction = (action, data) => {
 
   console.log(action);
   console.log(data);
-
-  /*
-  console.log(action);
-  console.log(data);
-  console.log(data.files[0]['name']);
-  console.log(data.files[0]['id']);
-  console.log(data.files[0]['isDir']);
-  */
-
-
-
 
 };
 
