@@ -1,2 +1,4 @@
 /network_explorer/web/node_modules
 /network_explorer/web/build
+/network_explorer/cast/node_modules
+/network_explorer/cast/build
