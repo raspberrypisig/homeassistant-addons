@@ -16,9 +16,8 @@ useEffect(()=> {
   fetch('/api/directories').then(response => response.json() ).then(json => {
     let files = [];
     json.map(x => {
-      const id = x['full'];
       const name = x['short'];
-      files.push({id: id, name: name, isDir: true});
+      files.push({id: uuidv4(), name: name, isDir: true});
     });
     setFiles(files);
   });
@@ -45,17 +44,17 @@ const handleFileAction = (action, data) => {
      fetch( '/api/directories' + currentPath).then(response => response.json() ).then(json => {
 
       json.map(x => {
-        const id = x['path'];
+        const url = x['full'];
         const name = x['short'];
-        files.push({id: id, name: name, isDir: true});
+        files.push({id: uuidv4(), name: name, isDir: true, url: url});
       });
 
 
       fetch('/api/files' + currentPath).then(response => response.json()).then(json => {
         json.map(x => {
-          const id = x['path'];
+          const url = x['full'];
           const name = x['short'];
-          files.push({id: id, name: name});
+          files.push({id: uuidv4(), name: name, url: url});
         });         
 
 
@@ -70,16 +69,43 @@ const handleFileAction = (action, data) => {
 
     else {
       console.log("File selected");
+      alert(data.files[0].url);
     }
   }
 
   else if (action.id === "open_files") {
+    currentPath = currentPath.substring(0, currentPath.lastIndexOf("/"));
+    console.log(currentPath);
     console.log(folderChain);
     let newfc = [...folderChain];
     newfc = newfc.splice(0, newfc.length - 1);
     console.log(newfc)
-    setFolderChain(newfc);
-    setFiles([{id: "/back", name: "back.jpg"}]);
+    //setFolderChain(newfc);
+    //setFiles([{id: "/back", name: "back.jpg"}]);
+
+    fetch( '/api/directories' + currentPath).then(response => response.json() ).then(json => {
+
+      json.map(x => {
+        const url = x['full'];
+        const name = x['short'];
+        files.push({id: uuidv4(), name: name, isDir: true, url: url});
+      });
+
+
+      fetch('/api/files' + currentPath).then(response => response.json()).then(json => {
+        json.map(x => {
+          const url = x['full'];
+          const name = x['short'];
+          files.push({id: uuidv4(), name: name, url: url});
+        });         
+
+
+        setFolderChain(newfc);
+        setFiles(files);      
+      });
+
+    });
+
   }
 
   console.log(action);
