@@ -1,14 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import './App.css';
 import 'chonky/style/main.css';
-import { FileBrowser, FileList, FileSearch, FileToolbar } from 'chonky';
+import { FileBrowser, FileList, FileSearch, FileToolbar, ChonkyActions } from 'chonky';
 import { v4 as uuidv4 } from 'uuid';
 
 function App() {
 
 const [files, setFiles] = useState([]);
 const [folderChain, setFolderChain] = useState([{id: uuidv4(), name: 'Network Shares'}]);
-const [currentfolderchain, SetCurrentFolderChain] = useState([]);
+let currentPath = "";
+
 
 useEffect(()=> {
   fetch('/api/directories').then(response => response.json() ).then(json => {
@@ -25,21 +26,40 @@ useEffect(()=> {
 const handleFileAction = (action, data) => {
   if (action.id === "change_selection") {
     if (data.files[0]  === undefined) return;
-    let name,id,isDir;
-    ({name, id, isDir} = data.files[0]);
+    let name,isDir;
+    ({name, isDir} = data.files[0]);
     if (isDir) {
-     console.log("Directory selected");
-
-     fetch('/api/directories/' + name).then(response => response.json() ).then(json => {
+      
+      currentPath = decodeURIComponent(decodeURIComponent(`${currentPath}/${name}`));
+      console.log(`Directory selected: ${name}`);
+      console.log(`Current Path: ${currentPath}`);
+     
       let files = [];
+      let newFolderChain;
+
+    newFolderChain = [{id: uuidv4(), name: 'Network Shares'}, {id: uuidv4(), name: name}];
+     
+     fetch( '/api/directories' + currentPath).then(response => response.json() ).then(json => {
+
       json.map(x => {
-        const id = x['full'];
+        const id = x['path'];
         const name = x['short'];
         files.push({id: id, name: name, isDir: true});
       });
-      const newFolderChain = [{id: uuidv4(), name: 'Network Shares'}, {id: uuidv4(), name: name}];
-      setFolderChain(newFolderChain);
-      setFiles(files);
+
+
+      fetch('/api/files' + currentPath).then(response => response.json()).then(json => {
+        json.map(x => {
+          const id = x['path'];
+          const name = x['short'];
+          files.push({id: id, name: name});
+        });         
+
+
+        setFolderChain(newFolderChain);
+        setFiles(files);      
+      });
+
     });
 
 
@@ -64,10 +84,22 @@ const handleFileAction = (action, data) => {
 
 };
 
+const fileActions = [
+  {
+      id: ChonkyActions.OpenFiles.id,
+  },
+  {
+      id: ChonkyActions.ChangeSelection.id 
+  },
+  {
+      id: ChonkyActions.OpenParentFolder.id,
+      requiresSelection: false
+  },
+];
 
 return (
     <div  className="App">
-        <FileBrowser files={files} folderChain={folderChain} onFileAction={handleFileAction}>
+        <FileBrowser files={files} folderChain={folderChain} onFileAction={handleFileAction} disableDefaultFileActions={true} fileActions={fileActions}>
             <FileToolbar />
             <FileSearch />
             <FileList />
