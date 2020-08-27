@@ -116,6 +116,30 @@ def haplayers():
     mediaplayers = [x['entity_id'] for x in rjson if x['entity_id'].startswith("media_player.")]
     return jsonify(mediaplayers)
 
+@app.route('/ha/cast', methods=["POST"])
+def castMusic():
+    r = request.get_json(force=True)
+    url = r['url'] 
+    entityid = r['player_entity_id']
+
+    print(url, flush=True)
+    print(entityid, flush=True)
+
+    supervisor_token = os.environ['SUPERVISOR_TOKEN']
+    r = requests.post('http://supervisor/core/api/services/media_player/play_media', 
+        json={
+            "entity_id": entityid,
+            "media_content_id": url,
+            "media_content_type": "music"
+        },
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + supervisor_token
+        }        
+    )
+    return r.text
+
+
 @app.route('/homeassistant')
 def homeassistant():
     contents=''
