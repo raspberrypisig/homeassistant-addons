@@ -4,14 +4,17 @@ import 'chonky/style/main.css';
 import { FileBrowser, FileList, FileSearch, FileToolbar, ChonkyActions } from 'chonky';
 import { v4 as uuidv4 } from 'uuid';
 
+let currentPath;
+
 function App() {
 
 const [files, setFiles] = useState([]);
 const [folderChain, setFolderChain] = useState([{id: uuidv4(), name: 'Network Shares'}]);
-let currentPath = "";
+
 
 
 useEffect(()=> {
+  currentPath = "";
   fetch('/api/directories').then(response => response.json() ).then(json => {
     let files = [];
     json.map(x => {
@@ -29,8 +32,8 @@ const handleFileAction = (action, data) => {
     let name,isDir;
     ({name, isDir} = data.files[0]);
     if (isDir) {
-      
-      currentPath = decodeURIComponent(decodeURIComponent(`${currentPath}/${name}`));
+      name = decodeURIComponent(decodeURIComponent(name));
+      currentPath = currentPath + "/" + name;
       console.log(`Directory selected: ${name}`);
       console.log(`Current Path: ${currentPath}`);
      
