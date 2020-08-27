@@ -103,6 +103,19 @@ def _proxy(*args, **kwargs):
 def favicon():
     return send_file("/html/favicon.ico")
 
+@app.route('/ha/players')
+def haplayers():
+    supervisor_token = os.environ['SUPERVISOR_TOKEN']
+    r = requests.get('http://supervisor/core/api/states', 
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + supervisor_token
+        }        
+    )
+    rjson = r.json()
+    mediaplayers = [x['entity_id'] for x in rjson if x['entity_id'].startswith("media_player.")]
+    return jsonify(mediaplayers)
+
 @app.route('/homeassistant')
 def homeassistant():
     contents=''
