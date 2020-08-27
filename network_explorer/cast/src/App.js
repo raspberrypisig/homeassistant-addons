@@ -11,8 +11,6 @@ function App() {
 const [files, setFiles] = useState([]);
 const [folderChain, setFolderChain] = useState([{id: uuidv4(), name: 'Network Shares'}]);
 
-
-
 useEffect(()=> {
   currentPath = "";
   fetch('/api/directories').then(response => response.json() ).then(json => {
@@ -40,7 +38,9 @@ const handleFileAction = (action, data) => {
       let files = [];
       let newFolderChain;
 
-    newFolderChain = [{id: uuidv4(), name: 'Network Shares'}, {id: uuidv4(), name: name}];
+    newFolderChain = [...folderChain, {id: uuidv4(), name: name}];
+    console.log(`Newfolderchain: ${newFolderChain}`);
+    //newFolderChain = [{id: uuidv4(), name: 'Network Shares'}, {id: uuidv4(), name: name}];
      
      fetch( '/api/directories' + currentPath).then(response => response.json() ).then(json => {
 
