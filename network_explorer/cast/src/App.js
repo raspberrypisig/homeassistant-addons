@@ -3,15 +3,36 @@ import './App.css';
 import 'chonky/style/main.css';
 import { FileBrowser, FileList, FileSearch, FileToolbar, ChonkyActions } from 'chonky';
 import { v4 as uuidv4 } from 'uuid';
+import Select from 'react-select';
 
 let currentPath;
+
+/*
+let playerOptions = [
+  { value: 'chocolate', label: 'Chocolate' },
+  { value: 'strawberry', label: 'Strawberry' },
+  { value: 'vanilla', label: 'Vanilla' },
+];
+*/
+
+let playerOptions = [];
 
 function App() {
 
 const [files, setFiles] = useState([]);
 const [folderChain, setFolderChain] = useState([{id: uuidv4(), name: 'Network Shares'}]);
+const [player, setPlayer] = useState(null);
+
 
 useEffect(()=> {
+  fetch('/ha/players').then(request => request.json()).then(json => {
+    playerOptions = json.map(x=> {return {value: x, label: x}});
+    if (playerOptions.length > 0) {
+      setPlayer(json[0]);
+    }
+    
+  });
+
   currentPath = "";
   fetch('/api/directories').then(response => response.json() ).then(json => {
     let files = [];
@@ -21,7 +42,23 @@ useEffect(()=> {
     });
     setFiles(files);
   });
-},  []);
+
+
+
+  /*
+  fetch('/ha/cast', {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+
+    }
+    ).then(response=>response.text()).then(text=>null);
+  },  []);
+*/
+}, []);
+
 
 const handleFileAction = (action, data) => {
   if (action.id === "change_selection") {
@@ -128,6 +165,16 @@ const fileActions = [
 
 return (
     <div  className="App">
+        <h2>Choose Media Player</h2>
+        { player &&
+        <Select
+        defaultValue={player}
+        onChange={setPlayer}
+        options={playerOptions}
+        />
+        }
+        <h2>Choose Music To Play</h2>
+
         <FileBrowser files={files} folderChain={folderChain} onFileAction={handleFileAction} disableDefaultFileActions={true} fileActions={fileActions}>
             <FileToolbar />
             <FileSearch />
