@@ -12,7 +12,7 @@ let playerOptions = [];
 function App() {
 
 const [files, setFiles] = useState([]);
-const [folderChain, setFolderChain] = useState([{id: uuidv4(), name: 'Network Shares'}]);
+const [folderChain, setFolderChain] = useState([{id: uuidv4(), name: 'Network Shares', path: '/'}]);
 const [player, setPlayer] = useState(null);
 
 
@@ -54,7 +54,7 @@ const handleFileAction = (action, data) => {
       let files = [];
       let newFolderChain;
 
-    newFolderChain = [...folderChain, {id: uuidv4(), name: name}];
+    newFolderChain = [...folderChain, {id: uuidv4(), name: name, path: currentPath}];
     console.log(`Newfolderchain: ${newFolderChain}`);
     //newFolderChain = [{id: uuidv4(), name: 'Network Shares'}, {id: uuidv4(), name: name}];
      
@@ -105,14 +105,16 @@ const handleFileAction = (action, data) => {
   }
 
   else if (action.id === "open_files") {
-    currentPath = currentPath.substring(0, currentPath.lastIndexOf("/"));
-    console.log(currentPath);
-    console.log(folderChain);
-    let newfc = [...folderChain];
-    newfc = newfc.splice(0, newfc.length - 1);
-    console.log(newfc)
-    //setFolderChain(newfc);
-    //setFiles([{id: "/back", name: "back.jpg"}]);
+   const targetid = data.target.id;
+   console.log(targetid);
+   const index = folderChain.findIndex(x => x.id === targetid);
+   console.log(index);
+   currentPath = folderChain[index].path;
+   console.log(currentPath);
+   const newFolderChain = folderChain.slice(0, index + 1);
+   console.log(newFolderChain);
+      
+  let files = [];
 
     fetch( '/api/directories' + currentPath).then(response => response.json() ).then(json => {
 
@@ -131,7 +133,7 @@ const handleFileAction = (action, data) => {
         });         
 
 
-        setFolderChain(newfc);
+        setFolderChain(newFolderChain);
         setFiles(files);      
       });
 
