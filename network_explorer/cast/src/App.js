@@ -110,6 +110,9 @@ const handleFileAction = (action, data) => {
    const index = folderChain.findIndex(x => x.id === targetid);
    console.log(index);
    currentPath = folderChain[index].path;
+   if (currentPath === "/") {
+     currentPath = "";
+   }
    console.log(currentPath);
    const newFolderChain = folderChain.slice(0, index + 1);
    console.log(newFolderChain);
