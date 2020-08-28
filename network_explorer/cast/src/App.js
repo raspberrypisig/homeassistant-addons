@@ -28,7 +28,8 @@ useEffect(()=> {
   fetch('/ha/players').then(request => request.json()).then(json => {
     playerOptions = json.map(x=> {return {value: x, label: x}});
     if (playerOptions.length > 0) {
-      setPlayer(json[0]);
+      console.log(json[0]);
+      setPlayer({value: json[0], label: json[0]});
     }
     
   });
@@ -166,7 +167,7 @@ const fileActions = [
 return (
     <div  className="App">
         <h2>Choose Media Player</h2>
-        { player &&
+        { player != null &&
         <Select
         defaultValue={player}
         onChange={setPlayer}
