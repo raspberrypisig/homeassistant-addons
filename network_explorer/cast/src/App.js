@@ -7,14 +7,6 @@ import Select from 'react-select';
 
 let currentPath;
 
-/*
-let playerOptions = [
-  { value: 'chocolate', label: 'Chocolate' },
-  { value: 'strawberry', label: 'Strawberry' },
-  { value: 'vanilla', label: 'Vanilla' },
-];
-*/
-
 let playerOptions = [];
 
 function App() {
@@ -45,19 +37,6 @@ useEffect(()=> {
   });
 
 
-
-  /*
-  fetch('/ha/cast', {
-    method: "post",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-
-    }
-    ).then(response=>response.text()).then(text=>null);
-  },  []);
-*/
 }, []);
 
 
@@ -106,8 +85,22 @@ const handleFileAction = (action, data) => {
     }
 
     else {
+
       console.log("File selected");
-      alert(data.files[0].url);
+      alert(`Selected file: ${data.files[0].url}`);
+      alert(`Selected Media player: ${player['value']}`)
+      fetch('/ha/cast', {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+        "player_entity_id": player['value'],
+         "url": data.files[0].url
+        })
+       }).then(response=>response.text()).then(text=>null);
+    
+
     }
   }
 
