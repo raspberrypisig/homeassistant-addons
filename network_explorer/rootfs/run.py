@@ -29,9 +29,9 @@ class NetworkShares:
             else:
                 share['isconnected'] = False
                 if share['guest']:
-                    result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename']])
+                    result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename'], share["smbver"]])
                 else:
-                    result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename'], share['username'], share['password']])
+                    result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename'],  share["smbver"],  share['username'], share['password']])
                 if result.returncode == 0:                    
                     share['isconnected'] = True
 
@@ -55,9 +55,9 @@ class NetworkShares:
         share = self.getShareFromName(sharename)
 
         if share['guest']:
-            result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename']])
+            result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename'],  share["smbver"]])
         else:
-            result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename'], share['username'], share['password']])
+            result = subprocess.run(["/mountshare.sh", share['sharetype'], share['sharepath'], share['sharename'],  share["smbver"], share['username'], share['password']])
         if result.returncode == 0:
             self.update(sharename, "isconnected", True)
             return True
@@ -67,12 +67,13 @@ class NetworkShares:
       
 
 
-    def add(self, type, path, mountdir, guest, username=None, password=None):
+    def add(self, type, path, mountdir, guest, smbver, username=None, password=None):
         self.shares.append({
           'sharetype': type,
           'sharepath': path,
           'sharename': mountdir,
           'guest': guest,
+          'smbver': smbver,
           'username': username,
           'password': password
         })
@@ -246,15 +247,15 @@ def disconnect(mountdir):
 def addnetworkshare():
     data = request.get_json(force=True)
     if data['guest']:        
-        result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename']])
+        result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename'],  data["smbver"]])
     else:
-        result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename'], data['username'], data['password']])
+        result = subprocess.run(["/mountshare.sh", data['sharetype'], data['sharepath'] , data['sharename'],  data["smbver"] ,data['username'], data['password']])
     
     if result.returncode == 0:
         if data['guest']:
-            networkshares.add(data["sharetype"],  data['sharepath'] , data['sharename'], data['guest'])
+            networkshares.add(data["sharetype"],  data['sharepath'] , data['sharename'], data['guest'],  data["smbver"])
         else:
-            networkshares.add(data["sharetype"],  data['sharepath'] , data['sharename'], data['guest'], data['username'], data['password'])
+            networkshares.add(data["sharetype"],  data['sharepath'] , data['sharename'], data['guest'],  data["smbver"], data['username'], data['password'])
     return str(result.returncode)
 
 @app.route('/admin/remove/<name>', methods=['POST'])
