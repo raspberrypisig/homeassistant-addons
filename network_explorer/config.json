@@ -10,14 +10,18 @@
     "map": [],
     "full_access": false,
     "privileged": ["SYS_ADMIN", "DAC_READ_SEARCH"],
-    "options": {},
+    "options": {
+      "dark_mode": false
+    },
     "ports": {
         "8099/tcp": 8002
       },
     "ports_description": {
         "8099/tcp": "Web Server port"
     },
-    "schema": {},
+    "schema": {
+        "dark_mode": "bool"
+    },
     "panel_icon": "mdi:wrench",
     "webui": "http://[HOST]:[PORT:8000]/admin",
     "ingress": true,

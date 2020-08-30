@@ -8,4 +8,8 @@ then
 fi
 nohup python -m http.server 80 &
 port=$(bashio::addons self 'addons.self.network' '.network["8099/tcp"]')
-python /run.py $port
+
+darkmode=$(bashio::config 'dark_mode')
+echo "Dark mode: $darkmode"
+
+python /run.py "$port" "$darkmode"
