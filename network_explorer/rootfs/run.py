@@ -11,6 +11,7 @@ HOST="0.0.0.0"
 PORT=8099
 
 EXTERNALPORT=sys.argv[1]
+DARKMODE=sys.argv[2]
 BASEDIR="/network_shares/"
 
 networkshares = None
@@ -264,6 +265,11 @@ def removenetworkshare(name):
     subprocess.run(["/umountshare.sh", name])
     return ""
 
+@app.route('/api/darkmode')
+def darkmode():
+    if DARKMODE == "true":
+        return jsonify(True)
+    return jsonify(False)
 
 @app.route('/admin')
 def httpserver():

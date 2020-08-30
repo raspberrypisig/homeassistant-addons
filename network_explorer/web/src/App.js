@@ -29,9 +29,15 @@ import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 function App() {
 
-  const theme = createMuiTheme({
+  const themeDark = createMuiTheme({
     palette: {
       type: 'dark'
+    }
+  });
+
+  const themeLight = createMuiTheme({
+    palette: {
+      type: 'light'
     }
   });
 
@@ -115,14 +121,22 @@ function App() {
     }
   }));
 
+  const [darkmode, SetDarkMode] = useState(false);
+
   const [shares, setShares] = useState([])
   //const [advancedOptions, setAdvancedOptions] = useState(true)
   const [guest, setGuest] = useState(false)
   const [sharetypeselect, SetShareTypeSelect] = useState("cifs")
   const [smbverselect, SetSMBVerSelect] = useState("default")
 
+
   useEffect(() => {
     fetch('/admin/shares').then(response => response.json()).then(text => {console.log(text); setShares(text);} );
+    fetch('/api/darkmode').then(response => response.json()).then(text => {
+      if (text) {
+        SetDarkMode(true);
+      }
+    });
   }, []);
 
   const validateForm = (sharename, sharepath) => {
@@ -229,7 +243,7 @@ function App() {
    };
 
   return (
-<ThemeProvider theme={theme} >    
+<ThemeProvider theme={darkmode ? themeDark: themeLight} >    
 <Paper style={{boxShadow: "none"}}>
 <Container component="main" maxWidth="xs">
 <CssBaseline />
