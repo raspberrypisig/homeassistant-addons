@@ -22,12 +22,18 @@ import { Button,
         } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Form } from 'react-final-form';
-import { TextField, Select, Checkboxes, CheckboxData } from 'mui-rff';
-//import './App.css';
+import { TextField, Select, Checkboxes } from 'mui-rff';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 
 
 function App() {
+
+  const theme = createMuiTheme({
+    palette: {
+      type: 'dark'
+    }
+  });
 
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -103,12 +109,17 @@ function App() {
     },
     remove: {
       color: 'red'
+    },
+    selection: {
+      marginBottom: "1rem"
     }
   }));
 
   const [shares, setShares] = useState([])
-  const [advancedOptions, setAdvancedOptions] = useState(false)
+  //const [advancedOptions, setAdvancedOptions] = useState(true)
   const [guest, setGuest] = useState(false)
+  const [sharetypeselect, SetShareTypeSelect] = useState("cifs")
+  const [smbverselect, SetSMBVerSelect] = useState("default")
 
   useEffect(() => {
     fetch('/admin/shares').then(response => response.json()).then(text => {console.log(text); setShares(text);} );
@@ -126,7 +137,7 @@ function App() {
       return false;
     }
 
-
+   
 
     if (values["sharetype"] === undefined) {
       values["sharetype"] = "cifs"
@@ -134,9 +145,12 @@ function App() {
     values["key"] = values["sharename"];
     values["isconnected"] = false;  
     values["guest"] = guest;
+    values["smbver"] = smbverselect;
 
-    const networkshare = {sharename: values["sharename"], sharetype: values["sharetype"], sharepath: values["sharepath"], guest: values["guest"], username: values["username"], password: values["password"]};
+    const networkshare = {sharename: values["sharename"], sharetype: values["sharetype"], sharepath: values["sharepath"], guest: values["guest"], username: values["username"], password: values["password"], smbver: values["smbver"]};
     console.log(networkshare);
+
+
 
     fetch('/admin/addnetworkshare', {
       method: "post", 
@@ -176,6 +190,14 @@ function App() {
     setGuest(!guest);
   }
 
+  const sharetypeChanged =  (event) => {    
+    SetShareTypeSelect(event.target.value);
+  }
+
+  const smbverChanged = (event) => {
+    SetSMBVerSelect(event.target.value);
+  }
+
    const onRemoveData = (id) => {
     const removedShare = shares.filter(a => a.sharename === id ? true:false);
     const nextState = shares.filter(a => a.sharename === id ? false:true);
@@ -207,6 +229,8 @@ function App() {
    };
 
   return (
+<ThemeProvider theme={theme} >    
+<Paper style={{boxShadow: "none"}}>
 <Container component="main" maxWidth="xs">
 <CssBaseline />
 
@@ -215,7 +239,7 @@ function App() {
        render={({handleSubmit}) => (
         <form onSubmit={handleSubmit}>
               
-          <Grid container className={classes.grid}>
+          <Grid container className={classes.grid} spacing={3} direction="column">
           <Typography component="h1" variant="h5" className={classes.heading}>Add Network Shares</Typography>
             <Grid item xs={12}  className={classes.textfield}>
               <TextField type="text" label="Share Name" name="sharename" helperText="eg. Music" required={true} variant="outlined"
@@ -282,15 +306,22 @@ function App() {
           
             </Grid>
           
-            <Grid item xs={12}>
-            <IconButton className={classes.nopadding} onClick={() => setAdvancedOptions(!advancedOptions)}><ExpandMoreIcon/></IconButton>
-            <span classes={classes.nopadding}>Advanced Options</span>
-              <Collapse in={advancedOptions}>
-              <Select  name="sharetype" label="Share Type" value="cifs" required={true}>
+ 
+            <Grid item xs={12} style={{ paddingBottom: "1rem" }}>
+              <Select name="sharetype"  className={classes.selection} value={sharetypeselect} onChange={sharetypeChanged} label="Share Type" >
                <MenuItem value="cifs">Windows Share</MenuItem>
              </Select>
-              </Collapse>
-            </Grid>                     
+             </Grid>
+             
+             <Grid item xs={12}>
+             <Select name="smbver" className={classes.selection}  label="SMB Version" value={smbverselect} onChange={smbverChanged}  data={[
+                { label: 'Default', value: 'default' },
+                { label: 'Legacy', value: '1.0'}
+             ]}/>            
+            
+             </Grid>
+
+                  
             <Grid item xs={12} className={classes.submit}>
                <Button variant="contained" color="primary" type="submit">
 					      Submit
@@ -373,6 +404,8 @@ function App() {
     </Grid>
      
     </Container>
+    </Paper>
+    </ThemeProvider>
   );
 }
 
