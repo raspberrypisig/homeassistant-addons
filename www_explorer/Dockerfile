@@ -3,16 +3,12 @@ FROM $BUILD_FROM
 
 ENV LANG C.UTF-8
 
-COPY requirements.txt /tmp/
-COPY run.py /
+COPY rootfs /
 
 RUN pip install \
     --no-cache-dir \
     --prefer-binary \
-    -r /tmp/requirements.txt 
-
-COPY run.sh /
-RUN chmod a+x /run.sh
+    -r /requirements.txt 
 
 CMD [ "/run.sh" ]
 

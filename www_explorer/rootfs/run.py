@@ -1,10 +1,13 @@
 from pathlib import Path
-from flask import Flask, jsonify, request, Response, send_file
+from flask import Flask, jsonify, request, Response, send_file, Blueprint
 import requests
 from bs4 import BeautifulSoup
+from commonroutes import castroutes
 
 app = Flask(__name__)
-BASEDIR = "."
+app.register_blueprint(castroutes)
+
+BASEDIR = "/"
 HOST="0.0.0.0"
 PORT=8000
 
@@ -24,6 +27,8 @@ def _proxy(*args, **kwargs):
     response = Response(resp.content, resp.status_code, headers)
     return response
 
+
+'''
 def modifyURL(elem):
     args = request.args.to_dict()
     if 'out' in args:
@@ -69,6 +74,59 @@ def listAllFilesInPath(req):
 @app.route('/api/directories/<path:req>')
 def listSubdirectories(req='/'):
     return listDir(BASEDIR, req)
+
+'''
+
+
+def modifyURLDir(elem, basepath):
+    return {
+        "short": elem.name,
+        "path": str(elem.relative_to(basepath)),
+        "full": f"http://{request.host}/{str(elem.relative_to(basepath))}"
+    }
+
+def listDir(basedir, requestedPath):
+  basepath = Path(basedir)
+  p = basepath.joinpath(requestedPath)
+  if p.is_dir():
+      directories =  [modifyURLDir(x, basepath) for x in p.iterdir() if x.is_dir()]
+      if requestedPath == "":
+        directories = [x for x in directories if x['short'] in whitelist]
+      return jsonify(directories)
+  else:
+      return jsonify([])
+
+@app.route('/api/directories/')
+@app.route('/api/directories/<path:req>')
+def listSubdirectories(req=""):
+    return listDir(BASEDIR, req)
+
+def isFile(elem):
+    if elem.is_file():
+        return True
+    else:
+        return False
+
+def listFiles(basedir, requestedPath, glob="*"):
+  basepath = Path(basedir)
+  p = basepath.joinpath(requestedPath)
+  if p.is_dir():
+      files = list(p.glob(glob))
+      files = list(filter(isFile, files)) 
+      files = [modifyURLDir(x, basepath)  for x in files]
+      return jsonify(files)
+  else:
+      return jsonify([])
+
+@app.route('/api/files/<path:req>/filter/<path:glob>')
+def listSelectedFilesInPath(req, glob):
+    return listFiles(BASEDIR, req, glob)
+
+
+@app.route('/api/files/')
+@app.route('/api/files/<path:req>')
+def getFiles(req=""):
+    return listFiles(BASEDIR, req)
 
 
 @app.route('/')
