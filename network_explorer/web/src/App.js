@@ -11,6 +11,7 @@ import { Button,
          CssBaseline, 
          Collapse, 
          IconButton,
+         Link,
          Box,
          Table,
          TableBody,
@@ -67,7 +68,7 @@ function App() {
       textAlign: 'center'
     },
     grid: {
-      marginTop: '2rem',
+      paddingTop: '2rem',
       marginBottom: '2rem',
       fontWeight: 200
     },
@@ -177,6 +178,7 @@ function App() {
         values["isconnected"] = true;
         setShares([...shares, values]);
         setTimeout(form.restart);
+        scrollToBottom();
       }
       else {
         alert("Sorry. Can't connect to share. Double-check network details");
@@ -241,6 +243,16 @@ function App() {
        }
      });
    };
+
+  const scrollToTop = (event) => {
+    event.preventDefault();
+    window.scroll({top: 0, left: 0, behavior: "smooth"});
+    return false;
+  }
+
+  const scrollToBottom = () => {
+    setTimeout(window.scroll({top: window.document.body.clientHeight, left: 0, behavior: "smooth"}));
+  }
 
   return (
 <ThemeProvider theme={darkmode ? themeDark: themeLight} >    
@@ -416,7 +428,18 @@ function App() {
       </Grid>
      ))}
     </Grid>
-     
+    <Grid container className={classes.grid} spacing={3} direction="column">
+       <Grid item xs={12}>
+          <Typography>
+            <Link href="#" onclick={scrollToTop}>Add Another Network Share</Link>
+          </Typography>
+       </Grid>
+       <Grid item xs={12}>
+       <Typography>
+            <Link href="/cast" >Cast Music</Link>
+          </Typography>
+       </Grid>
+    </Grid>
     </Container>
     </Paper>
     </ThemeProvider>
