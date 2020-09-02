@@ -10,14 +10,16 @@
     "map": ["config:ro", "share:ro", "backup:ro", "addons:ro", "ssl:ro"],
     "options": {},
     "ports": {
-        "8000/tcp": 8000
+        "8099/tcp": 8000
       },
     "ports_description": {
-        "8000/tcp": "Web Server port"
+        "8099/tcp": "Web Server port"
     },
     "schema": {},
     "webui": "http://[HOST]:[PORT:8000]",
     "homeassistant_api": true,
     "full_access": false,
-    "hassio_api": false
+    "hassio_api": false,
+    "ingress": true,
+    "ingress_entry": "/homeassistant"
 }

@@ -3,13 +3,17 @@ from flask import Flask, jsonify, request, Response, send_file, Blueprint
 import requests
 from bs4 import BeautifulSoup
 from commonroutes import castroutes
+import sys
 
 app = Flask(__name__)
 app.register_blueprint(castroutes)
 
 BASEDIR = "/"
 HOST="0.0.0.0"
-PORT=8000
+#PORT=8000
+PORT=8099
+EXTERNALPORT=sys.argv[1]
+
 
 whitelist=["addons","config","share","backup", "ssl"]
 
@@ -128,6 +132,13 @@ def listSelectedFilesInPath(req, glob):
 def getFiles(req=""):
     return listFiles(BASEDIR, req)
 
+@app.route('/homeassistant')
+def homeassistant():
+    contents=''
+    with open('/html/panel.html','r') as f:
+        contents = f.read()
+    contents = contents.replace('HOMEASSISTANTPORT', EXTERNALPORT)
+    return contents
 
 @app.route('/')
 def index():
