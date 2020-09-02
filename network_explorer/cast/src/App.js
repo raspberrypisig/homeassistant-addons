@@ -87,7 +87,7 @@ const handleFileAction = (action, data) => {
     else {
 
       console.log("File selected");
-      alert(`Selected file: ${data.files[0].url}`);
+      alert(`${data.files[0].url}`);
       alert(`Selected Media player: ${player['value']}`)
       fetch('/ha/cast', {
         method: "post",
@@ -149,6 +149,8 @@ const handleFileAction = (action, data) => {
 
 };
 
+
+/*
 const fileActions = [
   {
       id: ChonkyActions.OpenFiles.id,
@@ -160,6 +162,27 @@ const fileActions = [
       id: ChonkyActions.OpenParentFolder.id,
       requiresSelection: false
   },
+  {
+    id: ChonkyActions.ToggleShowFoldersFirst.id
+  },
+  {
+    id: ChonkyActions.ToggleSearch.id,
+    
+  }
+];
+*/
+
+const fileActions = [
+  ChonkyActions.ChangeSelection,
+  ChonkyActions.OpenParentFolder,
+  {
+    id: ChonkyActions.OpenFiles.id
+  },
+  ChonkyActions.ToggleSearch,
+  ChonkyActions.SortFilesByName,
+  ChonkyActions.SortFilesBySize,
+  ChonkyActions.SortFilesByDate,
+  ChonkyActions.ToggleShowFoldersFirst
 ];
 
 return (

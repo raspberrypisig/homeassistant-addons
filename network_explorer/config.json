@@ -1,6 +1,6 @@
 {
     "name": "Network Explorer",
-    "version": "0.3",
+    "version": "0.3.1",
     "slug": "network_explorer",
     "url": "https://github.com/raspberrypisig/homeassistant-addons/tree/master/network_explorer",
     "description": "Explore network files and folders from HTTP requests.",
