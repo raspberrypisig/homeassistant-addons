@@ -9,6 +9,7 @@
     "boot": "auto",
     "map": ["config:ro", "share:ro", "backup:ro", "addons:ro", "ssl:ro"],
     "options": {},
+    "panel_icon": "mdi:wrap-disabled",
     "ports": {
         "8099/tcp": 8000
       },

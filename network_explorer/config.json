@@ -22,7 +22,7 @@
     "schema": {
         "dark_mode": "bool"
     },
-    "panel_icon": "mdi:wrench",
+    "panel_icon": "mdi:network-outline",
     "webui": "http://[HOST]:[PORT:8000]/admin",
     "ingress": true,
     "ingress_entry": "/homeassistant",

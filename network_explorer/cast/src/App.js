@@ -128,17 +128,24 @@ const handleFileAction = (action, data) => {
       });
 
 
+      if (currentPath === "") {
+        setFolderChain(newFolderChain);
+        setFiles(files);  
+        return;        
+      }
+
       fetch('/api/files' + currentPath).then(response => response.json()).then(json => {
         json.map(x => {
           const url = x['full'];
           const name = x['short'];
           files.push({id: uuidv4(), name: name, url: url});
         });         
-
+        
 
         setFolderChain(newFolderChain);
         setFiles(files);      
       });
+     
 
     });
 
