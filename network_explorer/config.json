@@ -1,6 +1,6 @@
 {
     "name": "Network Explorer",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "slug": "network_explorer",
     "url": "https://github.com/raspberrypisig/homeassistant-addons/tree/master/network_explorer",
     "description": "Explore network files and folders from HTTP requests.",
@@ -8,7 +8,7 @@
     "startup": "application",
     "boot": "auto",
     "map": [],
-    "full_access": false,
+    "full_access": true,
     "privileged": ["SYS_ADMIN", "DAC_READ_SEARCH"],
     "options": {
       "dark_mode": false
