@@ -5,8 +5,16 @@ import os
 import subprocess
 import json
 from pathlib import Path
+from urllib.parse import urlparse
 
 castroutes = Blueprint('castroutes', __name__)
+
+@castroutes.route('/cast/favicon.ico')
+def favicon():
+    return send_file("/html/favicon.ico")
+
+def _getFilePath(url, basedir):
+    return basedir + urlparse(url).path
 
 @castroutes.route('/ha/players')
 def haplayers():
@@ -26,22 +34,36 @@ def castMusic():
     r = request.get_json(force=True)
     url = r['url'] 
     entityid = r['player_entity_id']
-
-    print(url, flush=True)
-    print(entityid, flush=True)
+    basedir = os.environ['BASEDIR']
+    filepath = _getFilePath(url, basedir)
+    fileformat = subprocess.run(["/fileformat.sh", filepath ], capture_output=True)
+    capturedout = fileformat.stdout.decode("utf-8")
+    print(type(capturedout), flush=True)
+    print(capturedout, flush=True)
+    mediacontenttype = "music"
+    if capturedout == "image":
+        mediacontenttype = "image"
+    elif capturedout == "video":
+        mediacontenttype = "video"
+    #print(url, flush=True)
+    #print(entityid, flush=True)
+    #print(filepath, flush=True)
+    #print(fileformat.returncode, flush=True)
+    print(mediacontenttype, flush=True)
 
     supervisor_token = os.environ['SUPERVISOR_TOKEN']
     r = requests.post('http://supervisor/core/api/services/media_player/play_media', 
         json={
             "entity_id": entityid,
             "media_content_id": url,
-            "media_content_type": "music"
+            "media_content_type": mediacontenttype
         },
         headers={
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + supervisor_token
         }        
     )
+    print(r.text, flush=True)
     return r.text
 
 @castroutes.route('/cast')

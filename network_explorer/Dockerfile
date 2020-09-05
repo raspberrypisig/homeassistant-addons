@@ -10,7 +10,7 @@ RUN pip install \
     --prefer-binary \
     -r /tmp/requirements.txt 
 
-RUN apk add --no-cache cifs-utils
+RUN apk add --no-cache file cifs-utils
 
 COPY rootfs /
 

@@ -10,5 +10,7 @@ RUN pip install \
     --prefer-binary \
     -r /requirements.txt 
 
+RUN apk add --no-cache file
+
 CMD [ "/run.sh" ]
 
