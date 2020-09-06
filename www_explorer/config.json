@@ -1,6 +1,6 @@
 {
     "name": "WWW Explorer",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "slug": "www_explorer",
     "url": "https://github.com/raspberrypisig/homeassistant-addons/www_explorer",
     "description": "Explore files and folders listing under /config/www directory from HTTP requests.",
