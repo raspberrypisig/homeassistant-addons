@@ -37,18 +37,11 @@ def castMusic():
     basedir = os.environ['BASEDIR']
     filepath = _getFilePath(url, basedir)
     fileformat = subprocess.run(["/fileformat.sh", filepath ], capture_output=True)
-    capturedout = fileformat.stdout.decode("utf-8")
-    print(type(capturedout), flush=True)
-    print(capturedout, flush=True)
-    mediacontenttype = "music"
-    if capturedout == "image":
-        mediacontenttype = "image"
-    elif capturedout == "video":
-        mediacontenttype = "video"
-    #print(url, flush=True)
-    #print(entityid, flush=True)
-    #print(filepath, flush=True)
-    #print(fileformat.returncode, flush=True)
+    mediacontenttype = fileformat.stdout.decode("utf-8")
+
+
+    print(url, flush=True)
+    print(entityid, flush=True)
     print(mediacontenttype, flush=True)
 
     supervisor_token = os.environ['SUPERVISOR_TOKEN']
