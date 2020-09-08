@@ -1,10 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import { TextField } from '@material-ui/core';
+import { TextField, ListItemText, ListItem } from '@material-ui/core';
 import './App.css';
 import 'chonky/style/main.css';
 import { FileBrowser, FileList, FileSearch, FileToolbar, ChonkyActions } from 'chonky';
 import { v4 as uuidv4 } from 'uuid';
 import Select from 'react-select';
+import { FixedSizeList } from 'react-window';
 
 let currentPath;
 
@@ -12,13 +13,61 @@ function Playlists() {
 
   const [createplaylist, SetCreatePlaylist] = useState('');
   const [existingplaylists, SetExistingPlaylists] = useState([]);
-  const [currentplaylist, SetCurrentPlaylist] = useState(null);
+  const [currentplaylist, SetCurrentPlaylist] = useState('');
   const [selection, SetSelection] = useState(null);
+  const [currentplaylistfiles, SetCurrentPlaylistFiles] = useState([]);
 
   useEffect(() => {
-    fetch('/playlists/currentplaylist').then(response => response.text()).then(text => console.log(text));
-    fetch('/playlists/playlists').then(response => response.text()).then(text => console.log(text));
+    
+    let playlists; 
+
+    fetch('/playlists/playlists').then(response => response.json()).then(json => {
+      console.log(json)
+      if (json.length === 0) {
+        return;
+      }
+      playlists = json.map((item) => {
+        return {
+          value: item,
+          label: item
+        }
+      });
+      SetExistingPlaylists(playlists);
+      fetch('/playlists/currentplaylist').then(response => response.text()).then(text => {
+        if (text === "") {
+          console.log("selection about to change: empty");           
+          console.log(playlists);          
+          SetCurrentPlaylist({value: playlists[0].value, label: playlists[0].value});
+        }
+        else {
+            console.log("selection about to change:");
+            SetCurrentPlaylist({value: text, label: text});
+          
+        }
+        console.log(text);
+      
+      });
+
+
+
+    });
   }, []);
+
+
+  useEffect(() => {
+    console.log("use effect:");
+    console.log(currentplaylist);
+    if (currentplaylist === "" || currentplaylist == "null") {
+      return;
+    }
+    fetch('/playlists/currentplaylist/' + currentplaylist.value, {
+      method: 'post'
+    }).then(response => response.text()).then(text => {
+      fetch('/playlists/currentplaylist/files').then(response => response.json()).then(json => {
+        SetCurrentPlaylistFiles(json);
+      });
+    });
+  }, [currentplaylist]);
 
   const createPlaylist = ()  => {
      console.log(`Create playlist`);
@@ -195,6 +244,24 @@ function Playlists() {
     ChonkyActions.ToggleShowFoldersFirst
   ];
 
+  function baseName(str)
+  {
+     var base = new String(str).substring(str.lastIndexOf('/') + 1); 
+      //if(base.lastIndexOf(".") != -1)       
+      //    base = base.substring(0, base.lastIndexOf("."));
+     return base;
+  }
+
+  function renderRow(props) {
+    const { index, style } = props;
+  
+    return (
+      <ListItem button style={style} key={index}>
+        <ListItemText primary={baseName(currentplaylistfiles[index])} />
+      </ListItem>
+    );
+  }
+
   return (
     <div  className="App">
       <h2>Playlists Page</h2>
@@ -215,7 +282,7 @@ function Playlists() {
         <p>3. You can select multiple folders at once using shift or ctrl key</p>
         <p>4. Add selection to playlist. You can do this multiple times. </p>
       <p>CURRENT PLAYLIST: {currentplaylist != null ? currentplaylist.value : "" }</p>
-        <p>PLAYLIST ITEMS COUNT: 0</p>
+  <p>PLAYLIST ITEMS COUNT: {currentplaylistfiles.length} </p>
         <p><a href="#viewplaylist">View Playlist</a></p>
         <p><button onClick={addSelectionToPlaylist}>ADD SELECTION TO PLAYLIST</button></p>
 
@@ -228,6 +295,9 @@ function Playlists() {
       </p>
       <p>
         <h2 id="viewplaylist">Current Playlist</h2>
+        <FixedSizeList height={400} width={300} itemSize={46} itemCount={currentplaylistfiles.length}>
+        {renderRow}
+      </FixedSizeList>
       </p>
     </div>
   );

@@ -16,7 +16,7 @@ class PlayListsManager:
     CURRENTPLAYLISTURI = "/data/currentplaylist.txt" 
 
     def __init__(self):
-        self.currentPlaylist = None
+        self.currentPlaylist = ''
         self.playlists = []
         self.load()
     
@@ -33,8 +33,24 @@ class PlayListsManager:
         p = list(Path(PlayListsManager.DATADIRECTORY).glob("*.txt"))
         self.playlists = [str(x)[len(PlayListsManager.DATADIRECTORY):] for x in p]
         self.playlists.remove(PlayListsManager.CURRENTPLAYLIST)
+        self.playlists = [x[:-len('.txt')] for x in self.playlists]
 
+    def setCurrentPlaylist(self, playlist):
+        self.currentPlaylist = playlist
+        with open(PlayListsManager.CURRENTPLAYLISTURI, 'w') as f:
+            f.write(playlist)
 
+    def addFolder(self, newentries):
+        print(newentries, flush=True)
+        print(self.currentPlaylist, flush=True)
+        with open("/data/" + self.currentPlaylist + ".txt", "w") as f:
+            f.write(json.dumps(newentries))
+
+    def currentPlaylistItems(self):
+        items = []
+        with open("/data/" + self.currentPlaylist + ".txt", "r") as f:
+            items = json.loads(f.read())
+        return items
 
 @castroutes.route('/cast/favicon.ico')
 def favicon():
@@ -93,6 +109,7 @@ def createPlaylist(playlist):
     if isFileExists:
         return str(False)
     f = open(playlistFile, 'w')
+    f.write("[]")
     f.close()
     return str(True)
 
@@ -100,24 +117,39 @@ def createPlaylist(playlist):
 def addFolder():
     selectedFiles = request.get_json(force=True)
     basedir = os.environ['BASEDIR']
+    playlistsManager = PlayListsManager()
     currentPlaylist = []
 
     for f in selectedFiles:
         if f['isDir']:
-            filepath = basedir + "/" +  f['name']
+            url = f['url']
+            filepath = _getFilePath(url, basedir)
             newplaylist = Path(filepath).rglob("*.*")
-            newplaylist = [str(x) for x in newplaylist]
+            newplaylist = [str(x)[len(basedir):] for x in newplaylist]
             currentPlaylist = list(set().union(currentPlaylist + newplaylist))
-
+            playlistsManager.addFolder(currentPlaylist)
         else:
             pass
 
     return jsonify(currentPlaylist)
 
+@castroutes.route('/playlists/currentplaylist/<newplaylist>', methods=['POST'])
+def setCurrentPlaylist(newplaylist):
+     playlistManager = PlayListsManager()
+     playlistManager.setCurrentPlaylist(newplaylist)
+     return ""
+
+
 @castroutes.route('/playlists/currentplaylist')
 def currentPlaylist():
     playlistManager = PlayListsManager()
-    return jsonify(playlistManager.currentPlaylist)
+    currentPlaylist = playlistManager.currentPlaylist
+    return currentPlaylist
+
+@castroutes.route('/playlists/currentplaylist/files')
+def currentPlaylistItems():
+    playlistManager = PlayListsManager()
+    return jsonify(playlistManager.currentPlaylistItems())
 
 @castroutes.route('/playlists/playlists')
 def playlists():
