@@ -9,6 +9,33 @@ from urllib.parse import urlparse
 
 castroutes = Blueprint('castroutes', __name__)
 
+
+class PlayListsManager:
+    DATADIRECTORY = "/data/"
+    CURRENTPLAYLIST = "currentplaylist.txt"
+    CURRENTPLAYLISTURI = "/data/currentplaylist.txt" 
+
+    def __init__(self):
+        self.currentPlaylist = None
+        self.playlists = []
+        self.load()
+    
+    def load(self):
+        self.loadCurrentPlaylist()
+        self.loadPlaylists()
+
+    def loadCurrentPlaylist(self):
+        if Path(PlayListsManager.CURRENTPLAYLISTURI).stat().st_size > 0 :
+            with open(PlayListsManager.CURRENTPLAYLISTURI, "r") as f:
+                self.currentPlaylist = f.read()
+
+    def loadPlaylists(self):
+        p = list(Path(PlayListsManager.DATADIRECTORY).glob("*.txt"))
+        self.playlists = [str(x)[len(PlayListsManager.DATADIRECTORY):] for x in p]
+        self.playlists.remove(PlayListsManager.CURRENTPLAYLIST)
+
+
+
 @castroutes.route('/cast/favicon.ico')
 def favicon():
     return send_file("/html/favicon.ico")
@@ -56,9 +83,48 @@ def castMusic():
             'Authorization': 'Bearer ' + supervisor_token
         }        
     )
-    print(r.text, flush=True)
+   
     return r.text
 
+@castroutes.route('/playlists/create/<playlist>')
+def createPlaylist(playlist):
+    playlistFile = f'/data/{playlist}.txt'
+    isFileExists = Path(playlistFile).is_file()
+    if isFileExists:
+        return str(False)
+    f = open(playlistFile, 'w')
+    f.close()
+    return str(True)
+
+@castroutes.route('/playlists/addfolder', methods=['POST'])
+def addFolder():
+    selectedFiles = request.get_json(force=True)
+    basedir = os.environ['BASEDIR']
+    currentPlaylist = []
+
+    for f in selectedFiles:
+        if f['isDir']:
+            filepath = basedir + "/" +  f['name']
+            newplaylist = Path(filepath).rglob("*.*")
+            newplaylist = [str(x) for x in newplaylist]
+            currentPlaylist = list(set().union(currentPlaylist + newplaylist))
+
+        else:
+            pass
+
+    return jsonify(currentPlaylist)
+
+@castroutes.route('/playlists/currentplaylist')
+def currentPlaylist():
+    playlistManager = PlayListsManager()
+    return jsonify(playlistManager.currentPlaylist)
+
+@castroutes.route('/playlists/playlists')
+def playlists():
+    playlistManager = PlayListsManager()
+    return jsonify(playlistManager.playlists)
+
+@castroutes.route('/playlists')
 @castroutes.route('/cast')
 def cast():
     contents=''

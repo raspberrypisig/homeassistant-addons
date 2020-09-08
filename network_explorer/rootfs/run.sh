@@ -1,5 +1,6 @@
 #!/usr/bin/with-contenv bashio
 
+touch /data/currentplaylist.txt
 mkdir -p /network_shares
 cd /network_shares
 if [ ! -f /data/network_shares.json ];
