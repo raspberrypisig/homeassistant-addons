@@ -43,8 +43,10 @@ class PlayListsManager:
     def addFolder(self, newentries):
         print(newentries, flush=True)
         print(self.currentPlaylist, flush=True)
+        items = self.currentPlaylistItems()
         with open("/data/" + self.currentPlaylist + ".txt", "w") as f:
-            f.write(json.dumps(newentries))
+            f.write(json.dumps(newentries + items))
+        return newentries + items
 
     def currentPlaylistItems(self):
         items = []
@@ -127,7 +129,7 @@ def addFolder():
             newplaylist = Path(filepath).rglob("*.*")
             newplaylist = [str(x)[len(basedir):] for x in newplaylist]
             currentPlaylist = list(set().union(currentPlaylist + newplaylist))
-            playlistsManager.addFolder(currentPlaylist)
+            currentPlaylist = playlistsManager.addFolder(currentPlaylist)
         else:
             pass
 

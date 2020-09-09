@@ -90,7 +90,10 @@ function Playlists() {
       headers: {
         'Content-Type': 'application/json'
       }
-    }).then(response => response.json()).then(json => console.log(json));
+    }).then(response => response.json()).then(json => {      
+      console.log(json);
+      SetCurrentPlaylistFiles(json);
+    });
     
   }
 
@@ -295,7 +298,7 @@ function Playlists() {
       </p>
       <p>
         <h2 id="viewplaylist">Current Playlist</h2>
-        <FixedSizeList height={400} width={300} itemSize={46} itemCount={currentplaylistfiles.length}>
+        <FixedSizeList height={400} width={800} itemSize={46} itemCount={currentplaylistfiles.length}>
         {renderRow}
       </FixedSizeList>
       </p>
