@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import { TextField, ListItemText, ListItem } from '@material-ui/core';
+import { TextField, ListItemText, ListItem, Button, AppBar, Tab } from '@material-ui/core';
+import { TabPanel, TabContext, TabList } from '@material-ui/lab';
 import './App.css';
 import 'chonky/style/main.css';
 import { FileBrowser, FileList, FileSearch, FileToolbar, ChonkyActions } from 'chonky';
@@ -16,6 +17,8 @@ function Playlists() {
   const [currentplaylist, SetCurrentPlaylist] = useState('');
   const [selection, SetSelection] = useState(null);
   const [currentplaylistfiles, SetCurrentPlaylistFiles] = useState([]);
+  const [tabvalue, SetTabValue] = useState("1");
+  
 
   useEffect(() => {
     
@@ -57,7 +60,7 @@ function Playlists() {
   useEffect(() => {
     console.log("use effect:");
     console.log(currentplaylist);
-    if (currentplaylist === "" || currentplaylist == "null") {
+    if (currentplaylist === "" || currentplaylist === "null") {
       return;
     }
     fetch('/playlists/currentplaylist/' + currentplaylist.value, {
@@ -80,6 +83,15 @@ function Playlists() {
       });
 
   };
+
+  const deletePlaylist = ()  => {
+    fetch('/playlists/currentplaylist/delete').then(response => response.text()).then(text => {
+      console.log(text);
+      SetExistingPlaylists(existingplaylists.filter((item)=> item !== currentplaylist));
+      SetCurrentPlaylist({value: text, label: text});
+    });
+  }
+
 
   const addSelectionToPlaylist = () => {
     console.log(selection);
@@ -249,7 +261,7 @@ function Playlists() {
 
   function baseName(str)
   {
-     var base = new String(str).substring(str.lastIndexOf('/') + 1); 
+     var base = str.substring(str.lastIndexOf('/') + 1); 
       //if(base.lastIndexOf(".") != -1)       
       //    base = base.substring(0, base.lastIndexOf("."));
      return base;
@@ -265,43 +277,82 @@ function Playlists() {
     );
   }
 
+ const handleTabChange = (event, newValue) => {
+   console.log(newValue);
+   console.log(event);
+   SetTabValue(newValue);
+ };
+
+ const clearPlaylist = () => {
+   console.log("clear playlist");
+   fetch('/playlists/currentplaylist/clear');
+   SetCurrentPlaylistFiles([]);
+ };
+
   return (
     <div  className="App">
       <h2>Playlists Page</h2>
+ 
+      <h2>Current Playlist</h2>
+      <Select name="existingplaylists" value={currentplaylist} onChange={SetCurrentPlaylist} options={existingplaylists}/>                
+      <p>&nbsp;</p>
+      <Button variant="contained" color="secondary" onClick={deletePlaylist}>DELETE PLAYLIST</Button>
+      <p>&nbsp;</p>
+      <TabContext value={tabvalue} >
+      <AppBar position="static"> 
+        <TabList onChange={handleTabChange} aria-label="Playlists">
+          <Tab label="Create Playlist" value="1" />
+          <Tab label="Add To Playlist"  value="2" />
+          <Tab label="View Playlist" value="3" />
+        </TabList>
+      </AppBar>
+
+
+      <TabPanel value="1">
       <p>
         <h2>Create Playlist</h2>
-        <TextField name="createplaylist" label="Create Playlist" variant="outlined" onChange={(event) => SetCreatePlaylist(event.target.value)} /> <p><button onClick={createPlaylist}>CREATE PLAYLIST</button></p>
+        <TextField name="createplaylist" label="Create Playlist" variant="outlined" onChange={(event) => SetCreatePlaylist(event.target.value)} /> 
+        <p><Button variant="contained" color="primary" onClick={createPlaylist}>CREATE PLAYLIST</Button></p>
       </p>
+      </TabPanel>
+      <TabPanel value="2">
       <p>
-        <h2>OR Select Existing Playlist</h2>
-        
-        <Select name="existingplaylists" value={currentplaylist} onChange={SetCurrentPlaylist} options={existingplaylists}/>                
-        
-      </p>
-      <p>
-        <h2>Add Folder to Playlist</h2>
+      <h2>Add Folder to Playlist</h2>
         <p>1. Choose folders from below</p>
         <p>2. Single click to select, double-click to open folder </p>
         <p>3. You can select multiple folders at once using shift or ctrl key</p>
-        <p>4. Add selection to playlist. You can do this multiple times. </p>
+        <p>4. Add selection to playlist. You can do this multiple times. </p>        
+      </p>      
       <p>CURRENT PLAYLIST: {currentplaylist != null ? currentplaylist.value : "" }</p>
-  <p>PLAYLIST ITEMS COUNT: {currentplaylistfiles.length} </p>
-        <p><a href="#viewplaylist">View Playlist</a></p>
-        <p><button onClick={addSelectionToPlaylist}>ADD SELECTION TO PLAYLIST</button></p>
+      <p>PLAYLIST ITEMS COUNT: {currentplaylistfiles.length} </p>
+      <p><Button variant="contained" color="primary" onClick={addSelectionToPlaylist}>ADD SELECTION TO PLAYLIST</Button></p>
+      <FileBrowser files={files} folderChain={folderChain} onFileAction={handleFileAction} disableDefaultFileActions={true} fileActions={fileActions}>
+      <FileToolbar />
+      <FileSearch />
+      <FileList />
+      </FileBrowser> 
 
-        <FileBrowser files={files} folderChain={folderChain} onFileAction={handleFileAction} disableDefaultFileActions={true} fileActions={fileActions}>
-            <FileToolbar />
-            <FileSearch />
-            <FileList />
-        </FileBrowser>     
-
-      </p>
+      </TabPanel>
+      <TabPanel value="3">
       <p>
         <h2 id="viewplaylist">Current Playlist</h2>
+        <p><Button variant="contained" color="secondary" onClick={clearPlaylist}>CLEAR PLAYLIST</Button></p>
         <FixedSizeList height={400} width={800} itemSize={46} itemCount={currentplaylistfiles.length}>
         {renderRow}
       </FixedSizeList>
-      </p>
+      </p>        
+      </TabPanel>      
+
+      </TabContext>
+
+      
+
+
+
+    
+
+      
+
     </div>
   );
 }

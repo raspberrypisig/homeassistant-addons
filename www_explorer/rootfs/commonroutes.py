@@ -40,17 +40,32 @@ class PlayListsManager:
         with open(PlayListsManager.CURRENTPLAYLISTURI, 'w') as f:
             f.write(playlist)
 
+    def clearCurrentPlaylist(self):
+        with open(PlayListsManager.DATADIRECTORY + self.currentPlaylist + ".txt", "w") as f:
+            f.truncate()
+            f.write("[]")
+
+    def deleteCurrentPlaylist(self):
+        Path(PlayListsManager.DATADIRECTORY + self.currentPlaylist + ".txt").unlink()
+        self.playlists.remove(self.currentPlaylist)
+        if len(self.playlists) > 0 :
+            self.currentPlaylist = self.playlists[0]
+        else:
+            self.currentPlaylist = ""
+        self.setCurrentPlaylist(self.currentPlaylist)
+
+
     def addFolder(self, newentries):
         print(newentries, flush=True)
         print(self.currentPlaylist, flush=True)
         items = self.currentPlaylistItems()
-        with open("/data/" + self.currentPlaylist + ".txt", "w") as f:
+        with open(PlayListsManager.DATADIRECTORY + self.currentPlaylist + ".txt", "w") as f:
             f.write(json.dumps(newentries + items))
         return newentries + items
 
     def currentPlaylistItems(self):
         items = []
-        with open("/data/" + self.currentPlaylist + ".txt", "r") as f:
+        with open(PlayListsManager.DATADIRECTORY + self.currentPlaylist + ".txt", "r") as f:
             items = json.loads(f.read())
         return items
 
@@ -106,7 +121,7 @@ def castMusic():
 
 @castroutes.route('/playlists/create/<playlist>')
 def createPlaylist(playlist):
-    playlistFile = f'/data/{playlist}.txt'
+    playlistFile = f'{PlayListsManager.DATADIRECTORY}{playlist}.txt'
     isFileExists = Path(playlistFile).is_file()
     if isFileExists:
         return str(False)
@@ -142,6 +157,11 @@ def setCurrentPlaylist(newplaylist):
      return ""
 
 
+@castroutes.route('/playlists/currentplaylist/clear')
+def clearCurrentPlaylist():
+    playlistManager = PlayListsManager()    
+    playlistManager.clearCurrentPlaylist()
+
 @castroutes.route('/playlists/currentplaylist')
 def currentPlaylist():
     playlistManager = PlayListsManager()
@@ -152,6 +172,12 @@ def currentPlaylist():
 def currentPlaylistItems():
     playlistManager = PlayListsManager()
     return jsonify(playlistManager.currentPlaylistItems())
+
+@castroutes.route('/playlists/currentplaylist/delete')
+def deleteCurrentPlaylist():
+    playlistManager = PlayListsManager()
+    playlistManager.deleteCurrentPlaylist()
+    return playlistManager.currentPlaylist
 
 @castroutes.route('/playlists/playlists')
 def playlists():
