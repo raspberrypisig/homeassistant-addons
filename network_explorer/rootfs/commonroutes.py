@@ -28,17 +28,26 @@ class PlayListsManager:
         if Path(PlayListsManager.CURRENTPLAYLISTURI).stat().st_size > 0 :
             with open(PlayListsManager.CURRENTPLAYLISTURI, "r") as f:
                 self.currentPlaylist = f.read()
+                if self.currentPlaylist is None:
+                    self.currentPlaylist = ''
+        print("currentPlaylist:" + self.currentPlaylist, flush=True)
 
     def loadPlaylists(self):
         p = list(Path(PlayListsManager.DATADIRECTORY).glob("*.txt"))
-        self.playlists = [str(x)[len(PlayListsManager.DATADIRECTORY):] for x in p]
-        self.playlists.remove(PlayListsManager.CURRENTPLAYLIST)
-        self.playlists = [x[:-len('.txt')] for x in self.playlists]
+        if len(p) > 0:
+            self.playlists = [str(x)[len(PlayListsManager.DATADIRECTORY):] for x in p]
+            self.playlists.remove(PlayListsManager.CURRENTPLAYLIST)
+            self.playlists = [x[:-len('.txt')] for x in self.playlists]
 
     def setCurrentPlaylist(self, playlist):
-        self.currentPlaylist = playlist
+        print("setcurrentplaylist:" + playlist)
+        if playlist is None:
+            pl = ''
+        else:
+            pl = playlist
+
         with open(PlayListsManager.CURRENTPLAYLISTURI, 'w') as f:
-            f.write(playlist)
+            f.write(pl)
 
     def clearCurrentPlaylist(self):
         with open(PlayListsManager.DATADIRECTORY + self.currentPlaylist + ".txt", "w") as f:

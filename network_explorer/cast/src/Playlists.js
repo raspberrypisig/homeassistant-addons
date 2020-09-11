@@ -1,5 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import { TextField, ListItemText, ListItem, Button, AppBar, Tab } from '@material-ui/core';
+import { TextField, ListItemText, ListItem, Button, AppBar, Tab,
+         Card, CardContent, CardMedia, IconButton, Typography} from '@material-ui/core';
+import {SkipNext, SkipPrevious, PlayArrow, Stop, Pause } from '@material-ui/icons';
 import { TabPanel, TabContext, TabList } from '@material-ui/lab';
 import './App.css';
 import 'chonky/style/main.css';
@@ -7,6 +9,7 @@ import { FileBrowser, FileList, FileSearch, FileToolbar, ChonkyActions } from 'c
 import { v4 as uuidv4 } from 'uuid';
 import Select from 'react-select';
 import { FixedSizeList } from 'react-window';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 let currentPath;
 
@@ -14,7 +17,7 @@ function Playlists() {
 
   const [createplaylist, SetCreatePlaylist] = useState('');
   const [existingplaylists, SetExistingPlaylists] = useState([]);
-  const [currentplaylist, SetCurrentPlaylist] = useState('');
+  const [currentplaylist, SetCurrentPlaylist] = useState({value: '', label: ''});
   const [selection, SetSelection] = useState(null);
   const [currentplaylistfiles, SetCurrentPlaylistFiles] = useState([]);
   const [tabvalue, SetTabValue] = useState("1");
@@ -60,7 +63,7 @@ function Playlists() {
   useEffect(() => {
     console.log("use effect:");
     console.log(currentplaylist);
-    if (currentplaylist === "" || currentplaylist === "null") {
+    if (currentplaylist.value === "" || currentplaylist.value === "null") {
       return;
     }
     fetch('/playlists/currentplaylist/' + currentplaylist.value, {
@@ -79,6 +82,7 @@ function Playlists() {
        if (text === "True") {
         SetExistingPlaylists([...existingplaylists, {value: createplaylist, label: createplaylist}]);
         SetCurrentPlaylist({value: createplaylist, label: createplaylist});
+        SetTabValue("2");
        }
       });
 
@@ -87,6 +91,9 @@ function Playlists() {
   const deletePlaylist = ()  => {
     fetch('/playlists/currentplaylist/delete').then(response => response.text()).then(text => {
       console.log(text);
+      if (text === "") {
+         SetCurrentPlaylistFiles([]);
+      }
       SetExistingPlaylists(existingplaylists.filter((item)=> item !== currentplaylist));
       SetCurrentPlaylist({value: text, label: text});
     });
@@ -289,8 +296,37 @@ function Playlists() {
    SetCurrentPlaylistFiles([]);
  };
 
+ const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+  },
+  details: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  content: {
+    flex: '1 0 auto',
+  },
+  cover: {
+    width: 151,
+  },
+  controls: {
+    display: 'flex',
+    alignItems: 'center',
+    paddingLeft: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+  },
+  playIcon: {
+    height: 38,
+    width: 38,
+  },
+}));
+
+const classes = useStyles();
+const theme = useTheme();
+
   return (
-    <div  className="App">
+    <div  className="App" style={{backgroundColor: "#f5f5f5"}}>
       <h2>Playlists Page</h2>
  
       <h2>Current Playlist</h2>
@@ -304,6 +340,7 @@ function Playlists() {
           <Tab label="Create Playlist" value="1" />
           <Tab label="Add To Playlist"  value="2" />
           <Tab label="View Playlist" value="3" />
+          <Tab label="Now Playing" value="4" />
         </TabList>
       </AppBar>
 
@@ -342,7 +379,42 @@ function Playlists() {
       </FixedSizeList>
       </p>        
       </TabPanel>      
-
+      <TabPanel value="4">
+      <Card className={classes.root}>
+      <div className={classes.details}>
+        <CardContent className={classes.content}>
+          <Typography component="h5" variant="h5">
+          {currentplaylist != null ? currentplaylist.value : "" }
+          </Typography>
+          <Typography variant="subtitle1" color="textSecondary">
+            Playing:
+          </Typography>
+        </CardContent>
+        <div className={classes.controls}>
+          <IconButton aria-label="previous">
+            {theme.direction === 'rtl' ? <SkipNext /> : <SkipPrevious />}
+          </IconButton>
+          <IconButton aria-label="play/pause">
+            <PlayArrow className={classes.playIcon} />
+          </IconButton>
+          <IconButton aria-label="stop">
+            <Stop className={classes.playIcon} />
+          </IconButton>
+          <IconButton aria-label="pause">
+            <Pause className={classes.playIcon} />
+          </IconButton>
+          <IconButton aria-label="next">
+            {theme.direction === 'rtl' ? <SkipPrevious /> : <SkipNext />}
+          </IconButton>
+        </div>
+      </div>
+      <CardMedia
+        className={classes.cover}
+        image="/static/images/cards/live-from-space.jpg"
+        title="Live from space album cover"
+      />
+    </Card>
+      </TabPanel>
       </TabContext>
 
       
