@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { TextField, ListItemText, ListItem, Button, AppBar, Tab,
-         Card, CardContent, CardMedia, IconButton, Typography} from '@material-ui/core';
-import {SkipNext, SkipPrevious, PlayArrow, Stop, Pause } from '@material-ui/icons';
+         Card, CardContent, CardMedia, IconButton, Typography, Tooltip} from '@material-ui/core';
+import {SkipNext, SkipPrevious, PlayArrow, Stop, Pause, Shuffle } from '@material-ui/icons';
 import { TabPanel, TabContext, TabList } from '@material-ui/lab';
 import './App.css';
 import 'chonky/style/main.css';
@@ -12,18 +12,32 @@ import { FixedSizeList } from 'react-window';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 let currentPath;
+  
+let playerOptions = [];
+
 
 function Playlists() {
 
+  const [player, setPlayer] = useState(null);
   const [createplaylist, SetCreatePlaylist] = useState('');
   const [existingplaylists, SetExistingPlaylists] = useState([]);
   const [currentplaylist, SetCurrentPlaylist] = useState({value: '', label: ''});
   const [selection, SetSelection] = useState(null);
   const [currentplaylistfiles, SetCurrentPlaylistFiles] = useState([]);
   const [tabvalue, SetTabValue] = useState("1");
-  
+  const [currentTrack, SetCurrentTrack] = useState('');
 
   useEffect(() => {
+
+
+    fetch('/ha/players').then(request => request.json()).then(json => {
+      playerOptions = json.map(x=> {return {value: x, label: x}});
+      if (playerOptions.length > 0) {
+        console.log(json[0]);
+        setPlayer({value: json[0], label: json[0]});
+      }
+      
+    });
     
     let playlists; 
 
@@ -296,6 +310,13 @@ function Playlists() {
    SetCurrentPlaylistFiles([]);
  };
 
+ const mediaPlayer = (action) => {
+    //console.log(player);
+    fetch(`/playlists/mediaplayer/${player.value}/${action}`).then(response => response.json()).then(json => console.log(json));
+ };
+
+
+
  const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -328,6 +349,14 @@ const theme = useTheme();
   return (
     <div  className="App" style={{backgroundColor: "#f5f5f5"}}>
       <h2>Playlists Page</h2>
+      <h2>Choose Media Player</h2>
+        { player != null &&
+        <Select
+        defaultValue={player}
+        onChange={setPlayer}
+        options={playerOptions}
+        />
+        }
  
       <h2>Current Playlist</h2>
       <Select name="existingplaylists" value={currentplaylist} onChange={SetCurrentPlaylist} options={existingplaylists}/>                
@@ -335,12 +364,11 @@ const theme = useTheme();
       <Button variant="contained" color="secondary" onClick={deletePlaylist}>DELETE PLAYLIST</Button>
       <p>&nbsp;</p>
       <TabContext value={tabvalue} >
-      <AppBar position="static"> 
+      <AppBar position="static" style={{backgroundColor: "#000000"}}> 
         <TabList onChange={handleTabChange} aria-label="Playlists">
           <Tab label="Create Playlist" value="1" />
           <Tab label="Add To Playlist"  value="2" />
           <Tab label="View Playlist" value="3" />
-          <Tab label="Now Playing" value="4" />
         </TabList>
       </AppBar>
 
@@ -370,16 +398,8 @@ const theme = useTheme();
       </FileBrowser> 
 
       </TabPanel>
-      <TabPanel value="3">
-      <p>
-        <h2 id="viewplaylist">Current Playlist</h2>
-        <p><Button variant="contained" color="secondary" onClick={clearPlaylist}>CLEAR PLAYLIST</Button></p>
-        <FixedSizeList height={400} width={800} itemSize={46} itemCount={currentplaylistfiles.length}>
-        {renderRow}
-      </FixedSizeList>
-      </p>        
-      </TabPanel>      
-      <TabPanel value="4">
+      <TabPanel value="3">   
+      <h2 id="viewplaylist">Current Playlist</h2>    
       <Card className={classes.root}>
       <div className={classes.details}>
         <CardContent className={classes.content}>
@@ -391,29 +411,51 @@ const theme = useTheme();
           </Typography>
         </CardContent>
         <div className={classes.controls}>
-          <IconButton aria-label="previous">
+          <Tooltip title="previous">
+          <IconButton onClick={() => mediaPlayer("previous")} aria-label="previous">
             {theme.direction === 'rtl' ? <SkipNext /> : <SkipPrevious />}
           </IconButton>
-          <IconButton aria-label="play/pause">
+          </Tooltip>
+          <Tooltip title="play">
+          <IconButton onClick={() =>  mediaPlayer("play")} aria-label="play/pause">
             <PlayArrow className={classes.playIcon} />
           </IconButton>
-          <IconButton aria-label="stop">
+          </Tooltip>
+          <Tooltip title="stop">
+          <IconButton onClick={() =>  mediaPlayer("stop")} aria-label="stop">
             <Stop className={classes.playIcon} />
           </IconButton>
-          <IconButton aria-label="pause">
+          </Tooltip>
+          <Tooltip title="pause">
+          <IconButton onClick={() =>  mediaPlayer("pause")} aria-label="pause">
             <Pause className={classes.playIcon} />
           </IconButton>
-          <IconButton aria-label="next">
+          </Tooltip>
+          <Tooltip title="next">
+          <IconButton onClick={() =>  mediaPlayer("next")} aria-label="next">
             {theme.direction === 'rtl' ? <SkipPrevious /> : <SkipNext />}
           </IconButton>
+          </Tooltip>
+          <Tooltip title="shuffle">
+          <IconButton onClick={() =>  mediaPlayer("shuffle")} aria-label="next">
+          <Shuffle className={classes.playIcon} />
+          </IconButton>          
+          </Tooltip>
         </div>
       </div>
       <CardMedia
         className={classes.cover}
-        image="/static/images/cards/live-from-space.jpg"
+        image="https://github.com/raspberrypisig/homeassistant-addons/raw/master/network_explorer/cast/public/nocover.jpg"
         title="Live from space album cover"
       />
     </Card>
+    <p>
+
+        <p><Button variant="contained" color="secondary" onClick={clearPlaylist}>CLEAR PLAYLIST</Button></p>
+        <FixedSizeList height={400} width={800} itemSize={46} itemCount={currentplaylistfiles.length}>
+        {renderRow}
+      </FixedSizeList>
+      </p> 
       </TabPanel>
       </TabContext>
 

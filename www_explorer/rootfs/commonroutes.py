@@ -9,6 +9,80 @@ from urllib.parse import urlparse
 
 castroutes = Blueprint('castroutes', __name__)
 
+class MediaPlayer:
+
+    def __init__(self, pm, mediaplayer):
+        self.playlistmanager = pm
+        self.currentTrack = ''
+        self.mediaplayer = mediaplayer
+
+    def shouldPlayNextTrack(self):
+        pass
+
+    def isUnderControl(self):
+        pass
+
+    def mediaPlayers(self):
+        supervisor_token = os.environ['SUPERVISOR_TOKEN']
+        r = requests.get('http://supervisor/core/api/states', 
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + supervisor_token
+        })        
+        rjson = r.json()
+        mediaplayers = [x for x in rjson if x['entity_id'] == self.mediaplayer]
+        return mediaplayers
+
+    def castMusic(self, url, entityid):
+        basedir = os.environ['BASEDIR']
+        filepath = _getFilePath(url, basedir)
+        fileformat = subprocess.run(["/fileformat.sh", filepath ], capture_output=True)
+        mediacontenttype = fileformat.stdout.decode("utf-8")
+
+
+        print(url, flush=True)
+        print(entityid, flush=True)
+        print(mediacontenttype, flush=True)
+
+        supervisor_token = os.environ['SUPERVISOR_TOKEN']
+        requests.post('http://supervisor/core/api/services/media_player/play_media', 
+        json={
+            "entity_id": entityid,
+            "media_content_id": url,
+            "media_content_type": mediacontenttype
+        },
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + supervisor_token
+        })
+    
+
+    def play(self, host):
+        #players = self.mediaPlayers()
+        print("----")
+        #print(players, flush=True)            
+        items = self.playlistmanager.currentPlaylistItems()
+        playitem = items[0]
+        playitemurl = host + playitem
+        print(self.mediaplayer, flush=True)
+        print(playitem, flush=True)
+        print(playitemurl, flush=True)
+        self.castMusic(playitemurl, self.mediaplayer)
+        return jsonify(0)
+
+
+    def stop(self):
+        pass
+
+    def pause(self):
+        pass
+
+    def next(self):
+        pass
+
+    def previous(self):
+        pass
+
 
 class PlayListsManager:
     DATADIRECTORY = "/data/"
@@ -192,6 +266,20 @@ def deleteCurrentPlaylist():
 def playlists():
     playlistManager = PlayListsManager()
     return jsonify(playlistManager.playlists)
+
+
+@castroutes.route('/playlists/mediaplayer/<player>/<action>')
+def mediaplayer(player, action):
+    #print(player, flush=True)
+    #print(action, flush=True)    
+    host = request.host_url[:-1]
+    print(host)
+    playlistManager = PlayListsManager()
+    mp = MediaPlayer(playlistManager, player)
+    if action == "play":
+        return mp.play(host)
+
+    return jsonify(-1)
 
 @castroutes.route('/playlists')
 @castroutes.route('/cast')
