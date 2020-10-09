@@ -87,7 +87,8 @@ class MediaPlayer:
 class PlayListsManager:
     DATADIRECTORY = "/data/"
     CURRENTPLAYLIST = "currentplaylist.txt"
-    CURRENTPLAYLISTURI = "/data/currentplaylist.txt" 
+    CURRENTPLAYLISTURI = "/data/currentplaylist.txt"
+    DEFAULTPLAYER = '/data/defaultplayer'
 
     def __init__(self):
         self.currentPlaylist = ''
@@ -158,6 +159,33 @@ def favicon():
 
 def _getFilePath(url, basedir):
     return basedir + urlparse(url).path
+
+def haplayersfull():
+    supervisor_token = os.environ['SUPERVISOR_TOKEN']
+    r = requests.get('http://supervisor/core/api/states', 
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + supervisor_token
+        }        
+    )
+    rjson = r.json()
+    mediaplayers = [{'entity_id': x['entity_id'], 'name': x['attributes']['friendly_name']} for x in rjson if x['entity_id'].startswith("media_player.")]
+    return mediaplayers
+
+@castroutes.route('/api/defaultplayer')
+def getDefaultPlayer():
+    defaultplayer = None
+    with open(PlayListsManager.DEFAULTPLAYER, 'r') as f:
+        defaultplayer = f.read()
+    return defaultplayer
+
+@castroutes.route('/api/defaultplayer/<defaultplayer>')
+def players(defaultplayer):
+    mediaplayers = haplayersfull()
+    player = [x['entity_id'] for x in mediaplayers if x['name'] == defaultplayer]
+    with open(PlayListsManager.DEFAULTPLAYER, 'w') as f:
+        f.write(player[0])
+    return ""
 
 @castroutes.route('/ha/players')
 def haplayers():
