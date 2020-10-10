@@ -177,7 +177,7 @@ def getDefaultPlayer():
     defaultplayer = None
     with open(PlayListsManager.DEFAULTPLAYER, 'r') as f:
         defaultplayer = f.read()
-    return defaultplayer
+    return jsonify(defaultplayer)
 
 @castroutes.route('/api/defaultplayer/<defaultplayer>')
 def players(defaultplayer):
@@ -185,7 +185,7 @@ def players(defaultplayer):
     player = [x['entity_id'] for x in mediaplayers if x['name'] == defaultplayer]
     with open(PlayListsManager.DEFAULTPLAYER, 'w') as f:
         f.write(player[0])
-    return ""
+    return jsonify("")
 
 @castroutes.route('/ha/players')
 def haplayers():
