@@ -172,12 +172,26 @@ def haplayersfull():
     mediaplayers = [{'entity_id': x['entity_id'], 'name': x['attributes']['friendly_name']} for x in rjson if x['entity_id'].startswith("media_player.")]
     return mediaplayers
 
+def _getDefaultPlayer():
+    defaultplayer = None
+    if Path(PlayListsManager.DEFAULTPLAYER).is_file():
+        with open(PlayListsManager.DEFAULTPLAYER, 'r') as f:
+            defaultplayer = f.read()
+    return defaultplayer
+
 @castroutes.route('/api/defaultplayer')
 def getDefaultPlayer():
-    defaultplayer = None
-    with open(PlayListsManager.DEFAULTPLAYER, 'r') as f:
-        defaultplayer = f.read()
-    return jsonify(defaultplayer)
+    player = _getDefaultPlayer()
+    return jsonify(player)
+
+@castroutes.route('/api/defaultplayerfriendlyname')
+def getDefaultPlayerFriendlyName():
+    player = _getDefaultPlayer()   
+    mediaplayers = haplayersfull()
+    defaultplayer = [x['name'] for x in mediaplayers if x['entity_id'] == player]    
+    if len(defaultplayer) == 0:
+        return jsonify(None)
+    return jsonify(defaultplayer[0])
 
 @castroutes.route('/api/defaultplayer/<defaultplayer>')
 def players(defaultplayer):
